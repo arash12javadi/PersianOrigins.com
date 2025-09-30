@@ -101,13 +101,14 @@
     pointer-events: none;
     transform: none;
 }
+
+
 .po-progress-bar {
     margin-bottom: 1.5rem;
-    padding: 1rem 1.25rem;
-    border: 1px solid #dedede;
-    border-radius: 0.75rem;
-    background: #ffffff;
-    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
 }
 
 .po-progress-bar__meta {
@@ -115,7 +116,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     font-weight: 600;
     color: #222222;
 }
@@ -123,9 +124,9 @@
 .po-progress-bar__track {
     position: relative;
     width: 100%;
-    height: 0.5rem;
+    height: 0.75rem;
     border-radius: 999px;
-    background: #f0f0f0;
+    background: #e5e5ea;
     overflow: hidden;
 }
 
@@ -137,15 +138,20 @@
     position: absolute;
     inset: 0;
     width: 0;
-    background: #c78421;
+    background: #5c1ae6;
     border-radius: inherit;
-    transition: width 0.3s ease;
+    transition: width 0.35s ease;
 }
 
 .po-progress-bar__counts {
-    margin-top: 0.75rem;
-    font-size: 0.875rem;
-    color: #555555;
-    font-weight: 600;
-    letter-spacing: 0.04em;
+    margin-top: 0.5rem;
+    font-size: 0.8125rem;
+    color: #666666;
+    font-weight: 500;
+}
+
+.po-progress-bar__numbers {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
 }

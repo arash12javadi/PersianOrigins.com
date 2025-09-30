@@ -11,7 +11,6 @@ class Persian_Origins_Reading_Progress {
 
     private $cookie_prefix = 'po_last_read_';
     private $read_cookie_prefix = 'po_read_posts_';
-    private $segments = 5;
 
     /**
      * Cached read posts lookups per category.
@@ -64,7 +63,7 @@ class Persian_Origins_Reading_Progress {
         }
 
         $expires = time() + MONTH_IN_SECONDS;
-        $cookie  = $this->cookie_prefix . $category_id;
+        $cookie  = $this->cookie_prefix + $category_id;
         $path    = defined('COOKIEPATH') ? (string) COOKIEPATH : '/';
         $domain  = defined('COOKIE_DOMAIN') ? (string) COOKIE_DOMAIN : '';
 
@@ -137,7 +136,7 @@ class Persian_Origins_Reading_Progress {
 
         $markup = $this->build_continue_button((int) $category->term_id);
         if ($markup) {
-            echo '<div class="po-continue-reading">' . $markup . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            echo '<div class="po-continue-reading">' . $markup . '</div>';
         }
     }
 
@@ -200,7 +199,6 @@ class Persian_Origins_Reading_Progress {
         $label = esc_html__('Continue Reading', 'persian-origins');
         if ($term instanceof \WP_Term) {
             $label = sprintf(
-                /* translators: %s: category name */
                 esc_html__('Continue reading %s', 'persian-origins'),
                 esc_html($term->name)
             );
@@ -225,7 +223,6 @@ class Persian_Origins_Reading_Progress {
         $class = $this->sanitize_class_attribute('po-continue-reading__link is-disabled ' . $atts['class']);
 
         $label = sprintf(
-            /* translators: %s: category name */
             esc_html__('Continue reading %s', 'persian-origins'),
             esc_html($category->name)
         );
@@ -272,10 +269,10 @@ class Persian_Origins_Reading_Progress {
 
         foreach ($categories as $category) {
             if ($category instanceof \WP_Term) {
-                $category_id = (int) $category->term_id;
-                $category_ids[] = $category_id;
-                $totals[$category_id] = $this->get_category_total_posts($category_id);
-                $progress = $this->get_category_progress($category_id);
+                $category_id     = (int) $category->term_id;
+                $category_ids[]  = $category_id;
+                $totals[$category_id]      = $this->get_category_total_posts($category_id);
+                $progress                  = $this->get_category_progress($category_id);
                 $read_counts[$category_id] = $progress['read_count'];
             }
         }
@@ -290,45 +287,7 @@ class Persian_Origins_Reading_Progress {
             'maxAge'     => MONTH_IN_SECONDS,
             'totals'     => $totals,
             'readCounts' => $read_counts,
-            'segments'   => $this->segments,
         ];
-    }
-
-    private function build_progress_bar_markup(int $category_id): string {
-        $progress = $this->get_category_progress($category_id);
-        if (empty($progress['total'])) {
-            return '';
-        }
-
-        $term = get_term($category_id, 'category');
-        if ($term instanceof \WP_Term) {
-            $label = sprintf(
-                /* translators: %s: category name */
-                esc_html__('Reading progress for %s', 'persian-origins'),
-                esc_html($term->name)
-            );
-        } else {
-            $label = esc_html__('Reading progress', 'persian-origins');
-        }
-
-        $percentage      = (int) $progress['percentage'];
-        $percentage_text = number_format_i18n($percentage) . '%';
-        $read_count      = (int) $progress['read_count'];
-        $total           = (int) $progress['total'];
-        $indicator       = $this->build_segment_indicator($percentage);
-
-        $markup  = '<div class="po-progress-bar" data-category="' . esc_attr($category_id) . '" data-total="' . esc_attr($total) . '" data-read="' . esc_attr($read_count) . '">';
-        $markup .= '<div class="po-progress-bar__meta">';
-        $markup .= '<span class="po-progress-bar__label">' . $label . '</span>';
-        $markup .= '<span class="po-progress-bar__percent">' . esc_html($percentage_text) . '</span>';
-        $markup .= '</div>';
-        $markup .= '<div class="po-progress-bar__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' . esc_attr($percentage) . '">';
-        $markup .= '<div class="po-progress-bar__fill" style="width:' . esc_attr($percentage) . '%"></div>';
-        $markup .= '</div>';
-        $markup .= '<div class="po-progress-bar__counts">' . esc_html($read_count . ' / ' . $total . ' ' . $indicator) . '</div>';
-        $markup .= '</div>';
-
-        return (string) apply_filters('persian_origins_progress_bar_markup', $markup, $progress, $category_id);
     }
 
     private function get_category_progress(int $category_id): array {
@@ -355,6 +314,42 @@ class Persian_Origins_Reading_Progress {
         $this->progress_cache[$category_id] = $progress;
 
         return $progress;
+    }
+
+    private function build_progress_bar_markup(int $category_id): string {
+        $progress = $this->get_category_progress($category_id);
+        if (empty($progress['total'])) {
+            return '';
+        }
+
+        $term = get_term($category_id, 'category');
+        if ($term instanceof \WP_Term) {
+            $label = sprintf(
+                esc_html__('Reading progress for %s', 'persian-origins'),
+                esc_html($term->name)
+            );
+        } else {
+            $label = esc_html__('Reading progress', 'persian-origins');
+        }
+        $percentage      = (int) $progress['percentage'];
+        $percentage_text = number_format_i18n($percentage) . '%';
+        $read_count      = (int) $progress['read_count'];
+        $total           = (int) $progress['total'];
+
+        $markup  = '<div class="po-progress-bar" data-category="' . esc_attr($category_id) . '" data-total="' . esc_attr($total) . '" data-read="' . esc_attr($read_count) . '">';
+        $markup .= '<div class="po-progress-bar__meta">';
+        $markup .= '<span class="po-progress-bar__label">' . $label . '</span>';
+        $markup .= '<span class="po-progress-bar__percent">' . esc_html($percentage_text) . '</span>';
+        $markup .= '</div>';
+        $markup .= '<div class="po-progress-bar__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' . esc_attr($percentage) . '">';
+        $markup .= '<div class="po-progress-bar__fill" style="width:' . esc_attr($percentage) . '%"></div>';
+        $markup .= '</div>';
+        $markup .= '<div class="po-progress-bar__counts" aria-live="polite">';
+        $markup .= '<span class="po-progress-bar__numbers">' . esc_html(sprintf('%d / %d', $read_count, $total)) . '</span>';
+        $markup .= '</div>';
+        $markup .= '</div>';
+
+        return (string) apply_filters('persian_origins_progress_bar_markup', $markup, $progress, $category_id);
     }
 
     private function get_category_total_posts(int $category_id): int {
@@ -425,24 +420,6 @@ class Persian_Origins_Reading_Progress {
         $parts = array_filter($parts);
 
         return array_values(array_unique($parts));
-    }
-
-    private function build_segment_indicator(int $percentage): string {
-        $segments = apply_filters('persian_origins_progress_segments', $this->segments);
-        if ($segments <= 0) {
-            return '';
-        }
-
-        $filled = (int) round(($percentage / 100) * $segments);
-        $filled = max(0, min($segments, $filled));
-
-        $output = '[';
-        for ($i = 0; $i < $segments; $i++) {
-            $output .= ($i < $filled) ? '+' : '-';
-        }
-        $output .= ']';
-
-        return $output;
     }
 
     private function sanitize_class_attribute(string $class): string {

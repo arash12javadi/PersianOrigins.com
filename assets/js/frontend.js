@@ -90,20 +90,8 @@
         });
     }
 
-    function buildSegments(percentage, segments) {
-        var totalSegments = typeof segments === 'number' && segments > 0 ? segments : 5;
-        var bounded = Math.max(0, Math.min(100, percentage));
-        var filled = Math.round((bounded / 100) * totalSegments);
-        var output = '[';
 
-        for (var i = 0; i < totalSegments; i++) {
-            output += i < filled ? '+' : '-';
-        }
-
-        return output + ']';
-    }
-
-    function updateProgressBars(categoryId, readCount, total, segments) {
+    function updateProgressBars(categoryId, readCount, total) {
         var bars = document.querySelectorAll('.po-progress-bar[data-category="' + categoryId + '"]');
         if (!bars.length) {
             return;
@@ -135,7 +123,12 @@
 
             var countsEl = bar.querySelector('.po-progress-bar__counts');
             if (countsEl) {
-                countsEl.textContent = readCount + ' / ' + total + ' ' + buildSegments(percentage, segments);
+                var numbersEl = countsEl.querySelector('.po-progress-bar__numbers');
+                if (numbersEl) {
+                    numbersEl.textContent = readCount + ' / ' + total;
+                } else {
+                    countsEl.textContent = readCount + ' / ' + total;
+                }
             }
         });
     }
@@ -150,7 +143,6 @@
             var maxAge = progress.maxAge || (30 * 24 * 60 * 60);
             var totals = progress.totals || {};
             var initialReadCounts = progress.readCounts || {};
-            var segments = progress.segments || 5;
 
             progress.categories.forEach(function (categoryIdRaw) {
                 var categoryId = parseInt(categoryIdRaw, 10);
@@ -214,10 +206,29 @@
                     readCount = parseInt(initialReadCounts[categoryId], 10) || 0;
                 }
 
-                updateProgressBars(categoryId, readCount, total, segments);
+                updateProgressBars(categoryId, readCount, total);
             });
         } catch (error) {
             // Fail quietly – tracking should not break the page.
         }
     }
 })(window, document);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
