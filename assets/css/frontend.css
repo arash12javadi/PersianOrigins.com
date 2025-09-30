@@ -1,0 +1,103 @@
+﻿/* Front-end styles for Persian Origins Plugin */
+.po-language-switch {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    background: #ffffff;
+    border: 1px solid #dedede;
+    border-radius: 999px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    font-size: 0.875rem;
+    z-index: 9999;
+}
+
+.po-language-switch__current {
+    color: #555555;
+    font-weight: 500;
+}
+
+.po-language-switch__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    background: #222222;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.po-language-switch__link:hover,
+.po-language-switch__link:focus {
+    background: #444444;
+    transform: translateY(-1px);
+}
+
+.po-story-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.po-story-nav__button {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background: #222222;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.po-story-nav__button:hover,
+.po-story-nav__button:focus {
+    background: #444444;
+}
+
+.po-story-nav__button.is-disabled {
+    background: #e1e1e1;
+    color: #777777;
+    pointer-events: none;
+    opacity: 0.65;
+}
+
+.po-continue-reading {
+    margin: 1.5rem 0;
+}
+
+.po-continue-reading__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1.25rem;
+    border-radius: 999px;
+    background: #c78421;
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.po-continue-reading__link:hover,
+.po-continue-reading__link:focus {
+    background: #a86a1b;
+    transform: translateY(-1px);
+}
+
+.po-continue-reading__link.is-disabled {
+    background: #ececec;
+    color: #777777;
+    pointer-events: none;
+    transform: none;
+}
