@@ -1,8 +1,8 @@
-<?php
+﻿<?php
 /**
  * Plugin Name: Persian Origins Plugin
  * Plugin URI: https://persianorigins.com
- * Description: Provides bilingual language switching, story navigation, and reading progress tracking for Persian Origins.
+ * Description: Provides bilingual language switching, story navigation, reading progress tracking, and frontend preferences for Persian Origins.
  * Version: 1.0.0
  * Author: Persian Origins
  * Author URI: https://persianorigins.com
@@ -21,6 +21,7 @@ final class Persian_Origins_Plugin {
     const VERSION = '1.0.0';
 
     private $language_switcher;
+    private $site_settings;
     private $story_navigation;
     private $reading_progress;
     private $shortcodes;
@@ -62,6 +63,7 @@ final class Persian_Origins_Plugin {
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-language-switcher.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-story-navigation.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-reading-progress.php';
+        require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-site-settings.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-shortcodes.php';
     }
 
@@ -69,11 +71,13 @@ final class Persian_Origins_Plugin {
         $this->language_switcher = new Persian_Origins_Language_Switcher();
         $this->story_navigation  = new Persian_Origins_Story_Navigation();
         $this->reading_progress  = new Persian_Origins_Reading_Progress();
+        $this->site_settings     = new Persian_Origins_Site_Settings($this->language_switcher);
         $this->shortcodes        = new Persian_Origins_Shortcodes($this->language_switcher, $this->reading_progress);
 
         $this->language_switcher->register();
         $this->story_navigation->register();
         $this->reading_progress->register();
+        $this->site_settings->register();
         $this->shortcodes->register();
     }
 
@@ -104,6 +108,7 @@ final class Persian_Origins_Plugin {
 
         $localize_data = [
             'readingProgress' => $this->reading_progress->get_script_data(),
+            'siteSettings'    => $this->site_settings->get_script_data(),
         ];
 
         wp_localize_script('persian-origins-frontend', 'PersianOriginsData', $localize_data);

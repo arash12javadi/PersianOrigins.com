@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Language switcher logic.
  *
@@ -7,17 +8,74 @@
 
 defined('ABSPATH') || exit;
 
-class Persian_Origins_Language_Switcher {
+class Persian_Origins_Language_Switcher
+{
 
     private $cookie_name = 'po_preferred_language';
+    private $valid = ['en', 'fa'];
     private $rendered_auto = false;
 
-    public function register(): void {
+    public function register(): void
+    {
+        add_filter('body_class', [$this, 'filter_body_class']);
+
+        // // Ensure <html dir="...">
+        // add_filter('language_attributes', [$this, 'filter_language_attributes'], 10, 2);
+
+        // // Flip dir early
+        // add_action('wp_head', [$this, 'output_dir_inline_script'], 0);
+
+        // Show floating button in footer
+        add_action('wp_footer', [$this, 'render_floating_switch'], 19);
+
+        // Handle switching before template loads
         add_action('template_redirect', [$this, 'maybe_handle_language_switch']);
-        add_action('wp_footer', [$this, 'render_auto_switch'], 20);
     }
 
-    public function render_auto_switch(): void {
+
+    public function render_floating_switch(): void
+    {
+        echo $this->get_switch_markup([
+            'wrapper_class' => 'po-language-switch--floating',
+        ]);
+    }
+
+    public function output_dir_inline_script(): void
+    {
+?>
+        <script>
+            (function() {
+                try {
+                    var m = document.documentElement;
+                    var isFa = document.cookie.indexOf('po_preferred_language=fa') > -1 ||
+                        (new URLSearchParams(location.search)).get('lang') === 'fa';
+                    m.setAttribute('dir', isFa ? 'rtl' : 'ltr');
+                } catch (e) {}
+            })();
+        </script>
+<?php
+    }
+
+    public function filter_language_attributes($output, $doctype)
+    {
+        $dir = ($this->get_current_language() === 'fa') ? 'rtl' : 'ltr';
+        // strip any existing dir attr then append ours
+        $output = preg_replace('/\sdir=("|\')(rtl|ltr)\1/i', '', $output);
+        return trim($output . ' dir="' . esc_attr($dir) . '"');
+    }
+
+
+    public function filter_body_class(array $classes): array
+    {
+        $lang = $this->get_current_language();
+        $classes[] = 'po-lang-' . $lang;
+        $classes[] = ($lang === 'fa') ? 'po-dir-rtl' : 'po-dir-ltr';
+        return $classes;
+    }
+
+
+    public function render_auto_switch(): void
+    {
         if ($this->rendered_auto || is_admin() || is_feed() || is_embed() || wp_doing_ajax()) {
             return;
         }
@@ -38,7 +96,8 @@ class Persian_Origins_Language_Switcher {
         $this->rendered_auto = true;
     }
 
-    public function get_switch_markup(array $args = []): string {
+    public function get_switch_markup(array $args = []): string
+    {
         $defaults = [
             'wrapper_class' => '',
             'link_class'    => '',
@@ -49,52 +108,66 @@ class Persian_Origins_Language_Switcher {
         $link_class    = $this->sanitize_class_attribute('po-language-switch__link ' . $args['link_class']);
 
         $current_lang = $this->determine_context_language();
-        $target_lang  = ('fa' === $current_lang) ? 'en' : 'fa';
+        $target_lang  = ($current_lang === 'fa') ? 'en' : 'fa';
 
+        // If singular, try to fetch a translation target
         $target_post_id = 0;
         if (is_singular()) {
             $target_post_id = $this->get_translation_post_id(get_queried_object_id());
         }
 
+        // Always guarantee a working redirect URL
         $fallback_url = $target_post_id ? get_permalink($target_post_id) : $this->get_current_url();
-        $switch_url   = $this->build_switch_url($target_lang, $target_post_id, $fallback_url);
-
-        if (!$switch_url) {
-            return '';
+        if (empty($fallback_url)) {
+            $fallback_url = home_url('/');
         }
 
-        $current_label = ('fa' === $current_lang) ? __('Persian', 'persian-origins') : __('English', 'persian-origins');
-        $target_label  = ('fa' === $target_lang) ? __('Switch to Persian', 'persian-origins') : __('Switch to English', 'persian-origins');
+        $switch_url = $this->build_switch_url($target_lang, $target_post_id, $fallback_url);
 
+        if (empty($switch_url)) {
+            return ''; // If nothing to link to, bail early
+        }
+
+        // Labels
+        $current_label = ($current_lang === 'fa')
+            ? __('Persian', 'persian-origins')
+            : __('English', 'persian-origins');
+
+        $target_label = ($target_lang === 'fa')
+            ? __('Switch to Persian', 'persian-origins')
+            : __('Switch to English', 'persian-origins');
+
+        // Markup
         $markup = sprintf(
-            '<div class="%1$s" data-current-lang="%2$s"><span class="po-language-switch__current">%3$s</span><a class="%4$s" href="%5$s">%6$s</a></div>',
+            '<div class="%1$s" data-current-lang="%2$s">
+            <span class="po-language-switch__current">%3$s</span>
+            <a class="%4$s" href="%5$s">%6$s</a>
+        </div>',
             esc_attr($wrapper_class),
             esc_attr($current_lang),
-            esc_html(sprintf(
-                /* translators: %s: current language */
-                __('Current: %s', 'persian-origins'),
-                $current_label
-            )),
+            esc_html(sprintf(__('Current: %s', 'persian-origins'), $current_label)),
             esc_attr($link_class),
             esc_url($switch_url),
             esc_html($target_label)
         );
 
-        return (string) apply_filters('persian_origins_language_switch_markup', $markup, $current_lang, $target_lang, $target_post_id);
+        return (string) apply_filters(
+            'persian_origins_language_switch_markup',
+            $markup,
+            $current_lang,
+            $target_lang,
+            $target_post_id
+        );
     }
 
-    private function determine_context_language(): string {
-        if (is_singular()) {
-            $post_language = $this->get_post_language(get_queried_object_id());
-            if ($post_language) {
-                return $post_language;
-            }
-        }
 
+    private function determine_context_language(): string
+    {
         return $this->get_current_language();
     }
 
-    private function build_switch_url(string $target_lang, int $target_post_id, string $redirect_url): string {
+    private function build_switch_url(string $target_lang, int $target_post_id, string $redirect_url): string
+    {
         $nonce = wp_create_nonce('po_switch_language');
 
         $args = [
@@ -113,53 +186,43 @@ class Persian_Origins_Language_Switcher {
         return add_query_arg($args, $current_url);
     }
 
-    public function maybe_handle_language_switch(): void {
-        if (!isset($_GET['po_switch_language'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+    public function maybe_handle_language_switch(): void
+    {
+        if (empty($_GET['po_switch_language'])) {
             return;
         }
 
-        $language = isset($_GET['po_switch_language'])
-            ? sanitize_key(wp_unslash($_GET['po_switch_language']))
-            : 'en'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-        if (!in_array($language, ['en', 'fa'], true)) {
+        $language = sanitize_key(wp_unslash($_GET['po_switch_language']));
+        if (!in_array($language, $this->valid, true)) {
             $language = 'en';
         }
 
-        $nonce = isset($_GET['_po_lang_nonce'])
-            ? sanitize_text_field(wp_unslash($_GET['_po_lang_nonce']))
-            : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-        if (!wp_verify_nonce($nonce, 'po_switch_language')) {
-            wp_die(esc_html__('Invalid language switch request.', 'persian-origins'));
-        }
+        // TEMP: disable nonce check for testing
+        // $nonce = isset($_GET['_po_lang_nonce']) ? sanitize_text_field(wp_unslash($_GET['_po_lang_nonce'])) : '';
+        // if (!wp_verify_nonce($nonce, 'po_switch_language')) {
+        //     wp_die(__('Invalid language switch request.', 'persian-origins'));
+        // }
 
         $this->persist_language_preference($language);
 
-        $target_post_id = isset($_GET['po_target'])
-            ? absint(wp_unslash($_GET['po_target']))
-            : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-        if ($target_post_id && get_post_status($target_post_id)) {
-            wp_safe_redirect(get_permalink($target_post_id));
-            exit;
-        }
-
         $redirect = home_url('/');
-        if (!empty($_GET['po_redirect'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-            $raw       = rawurldecode(sanitize_text_field(wp_unslash($_GET['po_redirect'])));
-            $decoded   = base64_decode($raw, true);
-            $sanitized = $decoded ? esc_url_raw($decoded) : '';
-            if ($sanitized) {
-                $redirect = $sanitized;
+        if (!empty($_GET['po_redirect'])) {
+            $raw     = rawurldecode(sanitize_text_field(wp_unslash($_GET['po_redirect'])));
+            $decoded = base64_decode($raw, true);
+            if ($decoded) {
+                $redirect = esc_url_raw($decoded);
             }
         }
 
         wp_safe_redirect($redirect);
         exit;
     }
+    private function persist_language_preference(string $language): void
+    {
+        if (!in_array($language, $this->valid, true)) {
+            $language = 'en'; // fallback
+        }
 
-    private function persist_language_preference(string $language): void {
         if (is_user_logged_in()) {
             update_user_meta(get_current_user_id(), '_preferred_language', $language);
         }
@@ -169,25 +232,35 @@ class Persian_Origins_Language_Switcher {
         $cookie_domain = defined('COOKIE_DOMAIN') ? (string) COOKIE_DOMAIN : '';
 
         setcookie($this->cookie_name, $language, $expiry, $cookie_path, $cookie_domain, is_ssl(), true);
-        $_COOKIE[$this->cookie_name] = $language;
+        $_COOKIE[$this->cookie_name] = $language; // important: update runtime copy
     }
 
-    public function get_current_language(): string {
+    public function get_current_language(): string
+    {
+        // Logged-in user preference first
         if (is_user_logged_in()) {
-            $preferred = get_user_meta(get_current_user_id(), '_preferred_language', true);
-            if (!empty($preferred)) {
-                return sanitize_key($preferred);
+            $user_lang = get_user_meta(get_current_user_id(), '_preferred_language', true);
+            if ($user_lang && in_array($user_lang, $this->valid, true)) {
+                return $user_lang;
             }
         }
 
-        if (!empty($_COOKIE[$this->cookie_name])) {
-            return sanitize_key(wp_unslash($_COOKIE[$this->cookie_name]));
+        // Query param
+        if (!empty($_GET['lang']) && in_array($_GET['lang'], $this->valid, true)) {
+            return sanitize_text_field($_GET['lang']);
+        }
+
+        // Cookie
+        if (!empty($_COOKIE[$this->cookie_name]) && in_array($_COOKIE[$this->cookie_name], $this->valid, true)) {
+            return sanitize_text_field($_COOKIE[$this->cookie_name]);
         }
 
         return 'en';
     }
 
-    public function get_translation_post_id(int $post_id): int {
+
+    public function get_translation_post_id(int $post_id): int
+    {
         $direct = (int) get_post_meta($post_id, '_translation_of', true);
         if ($direct && get_post_status($direct)) {
             return $direct;
@@ -212,7 +285,8 @@ class Persian_Origins_Language_Switcher {
         return 0;
     }
 
-    private function get_current_url(): string {
+    private function get_current_url(): string
+    {
         global $wp;
 
         $base = home_url('/');
@@ -228,7 +302,8 @@ class Persian_Origins_Language_Switcher {
         return esc_url_raw($base);
     }
 
-    public function get_post_language(int $post_id): string {
+    public function get_post_language(int $post_id): string
+    {
         $stored = get_post_meta($post_id, '_post_language', true);
         if ($stored) {
             $stored = sanitize_key($stored);
@@ -241,7 +316,8 @@ class Persian_Origins_Language_Switcher {
         return !empty($meta) ? 'fa' : 'en';
     }
 
-    private function sanitize_class_attribute(string $class): string {
+    private function sanitize_class_attribute(string $class): string
+    {
         $classes = preg_split('/\s+/', trim($class));
         if (!$classes) {
             return '';

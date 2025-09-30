@@ -1,157 +1,325 @@
-﻿/* Front-end styles for Persian Origins Plugin */
+﻿/* ================================
+   Persian Origins – Frontend CSS
+   ================================ */
+
+/* ---------- Language Switch ---------- */
 .po-language-switch {
-    position: fixed;
-    top: 1rem;
-    right: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    background: #ffffff;
-    border: 1px solid #dedede;
-    border-radius: 999px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-    font-size: 0.875rem;
-    z-index: 9999;
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #ffffff;
+  border: 1px solid #dedede;
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  font-size: 0.875rem;
+  z-index: 9999;
 }
 
 .po-language-switch__current {
-    color: #555555;
-    font-weight: 500;
+  color: #555555;
+  font-weight: 500;
 }
 
 .po-language-switch__link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.35rem 0.75rem;
-    border-radius: 999px;
-    background: #222222;
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 0.2s ease, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: #222222;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .po-language-switch__link:hover,
 .po-language-switch__link:focus {
-    background: #444444;
-    transform: translateY(-1px);
+  background: #444444;
+  transform: translateY(-1px);
 }
 
+/* ---------- Story Navigation ---------- */
 .po-story-nav {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
 .po-story-nav__button {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1rem;
-    border-radius: 0.75rem;
-    background: #222222;
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 0.2s ease, opacity 0.2s ease;
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: #222222;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s ease, opacity 0.2s ease;
 }
 
 .po-story-nav__button:hover,
 .po-story-nav__button:focus {
-    background: #444444;
+  background: #444444;
 }
 
 .po-story-nav__button.is-disabled {
-    background: #e1e1e1;
-    color: #777777;
-    pointer-events: none;
-    opacity: 0.65;
+  background: #e1e1e1;
+  color: #777777;
+  pointer-events: none;
+  opacity: 0.65;
 }
 
+/* ---------- Continue Reading ---------- */
 .po-continue-reading {
-    margin: 1.5rem 0;
+  margin: 1.5rem 0;
 }
 
 .po-continue-reading__link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.5rem 1.25rem;
-    border-radius: 999px;
-    background: #c78421;
-    color: #ffffff;
-    text-decoration: none;
-    font-weight: 600;
-    transition: background 0.2s ease, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  background: #c78421;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .po-continue-reading__link:hover,
 .po-continue-reading__link:focus {
-    background: #a86a1b;
-    transform: translateY(-1px);
+  background: #a86a1b;
+  transform: translateY(-1px);
 }
 
 .po-continue-reading__link.is-disabled {
-    background: #ececec;
-    color: #777777;
-    pointer-events: none;
-    transform: none;
+  background: #ececec;
+  color: #777777;
+  pointer-events: none;
+  transform: none;
 }
 
-
+/* ---------- Progress Bar ---------- */
 .po-progress-bar {
-    margin-bottom: 1.5rem;
-    padding: 0;
-    border: none;
-    background: transparent;
-    box-shadow: none;
+  margin-bottom: 1.5rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
 }
 
 .po-progress-bar__meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #222222;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #222222;
 }
 
 .po-progress-bar__track {
-    position: relative;
-    width: 100%;
-    height: 0.75rem;
-    border-radius: 999px;
-    background: #e5e5ea;
-    overflow: hidden;
+  position: relative;
+  width: 100%;
+  height: 0.75rem;
+  border-radius: 999px;
+  background: #e5e5ea;
+  overflow: hidden;
 }
 
 .po-progress-bar__track[role="progressbar"] {
-    outline: none;
+  outline: none;
 }
 
 .po-progress-bar__fill {
-    position: absolute;
-    inset: 0;
-    width: 0;
-    background: #5c1ae6;
-    border-radius: inherit;
-    transition: width 0.35s ease;
+  position: absolute;
+  inset: 0;
+  width: 0;
+  background: #5c1ae6;
+  border-radius: inherit;
+  transition: width 0.35s ease;
 }
 
 .po-progress-bar__counts {
-    margin-top: 0.5rem;
-    font-size: 0.8125rem;
-    color: #666666;
-    font-weight: 500;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: #666666;
+  font-weight: 500;
 }
 
 .po-progress-bar__numbers {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ---------- Site Settings ---------- */
+.po-site-settings {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9998;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.po-site-settings__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid #dedede;
+  background: #ffffff;
+  color: #1f2937;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.po-site-settings__toggle:hover,
+.po-site-settings__toggle:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.18);
+}
+
+.po-site-settings__toggle-icon {
+  font-size: 1rem;
+}
+
+.po-site-settings__panel {
+  min-width: 240px;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid #dedede;
+  background: rgba(255, 255, 255, 0.97);
+  box-shadow: 0 22px 45px rgba(15, 23, 42, 0.2);
+}
+
+.po-site-settings__panel[hidden] {
+  display: none;
+}
+
+.po-site-settings__section + .po-site-settings__section {
+  margin-top: 1rem;
+}
+
+.po-site-settings__label {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  color: #475569;
+}
+
+.po-site-settings__sub-label {
+  display: block;
+  font-size: 0.75rem;
+  margin-bottom: 0.35rem;
+  color: #64748b;
+}
+
+.po-site-settings__select {
+  width: 100%;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.75rem;
+  border: 1px solid #d4d4d8;
+  background: #ffffff;
+  color: inherit;
+  font-size: 0.9rem;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+}
+
+.po-site-settings__select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+.po-site-settings__group[hidden] {
+  display: none;
+}
+
+/* ---------- Dark Theme Bits ---------- */
+body.po-theme-dark .po-progress-bar__meta {
+  color: #f8fafc;
+}
+body.po-theme-dark .po-progress-bar__counts {
+  color: #cbd5f5;
+}
+
+/* =====================================
+   Direction: only flip POST CONTENT
+   ===================================== */
+
+/* Flip RTL for post content containers only */
+body.po-dir-rtl .entry-content,
+body.po-dir-rtl .entry-content *,
+body.po-dir-rtl .post-content,
+body.po-dir-rtl .post-content * {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Force LTR for post content when needed */
+body.po-dir-ltr .entry-content,
+body.po-dir-ltr .entry-content *,
+body.po-dir-ltr .post-content,
+body.po-dir-ltr .post-content * {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Keep language switch & site-settings always LTR */
+body.po-dir-rtl .po-language-switch,
+body.po-dir-rtl .po-language-switch *,
+body.po-dir-rtl .po-site-settings,
+body.po-dir-rtl .po-site-settings * {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Move floating widgets to the left in RTL */
+body.po-dir-rtl .po-language-switch {
+  right: auto;
+  left: 1rem;
+  flex-direction: row-reverse;
+}
+body.po-dir-rtl .po-site-settings {
+  right: auto;
+  left: 1.5rem;
+}
+
+/* ---------- Responsive tweaks ---------- */
+@media (max-width: 600px) {
+  .po-language-switch {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+  body.po-dir-rtl .po-language-switch {
+    right: auto;
+    left: 0.75rem;
+  }
+
+  .po-site-settings {
+    bottom: 1rem;
+    right: 1rem;
+  }
+  body.po-dir-rtl .po-site-settings {
+    right: auto;
+    left: 1rem;
+  }
 }

@@ -8,6 +8,10 @@
 
     var data = window.PersianOriginsData || {};
     var progress = data.readingProgress || null;
+    var settings = data.siteSettings || null;
+
+    var body = document.body || document.getElementsByTagName('body')[0];
+    var html = document.documentElement;
 
     function setCookie(name, value, maxAge) {
         if (!name) {
@@ -60,7 +64,7 @@
                     return parseReadPosts(JSON.parse(trimmed));
                 }
             } catch (error) {
-                // Ignore JSON parse errors and fall back to CSV parsing.
+                // Fall back to simple parsing.
             }
 
             return trimmed.split(',').map(function (part) {
@@ -90,6 +94,132 @@
         });
     }
 
+    function removeClassByPrefix(element, prefix) {
+        if (!element || !element.classList) {
+            return;
+        }
+
+        var classes = Array.prototype.slice.call(element.classList);
+        classes.forEach(function (className) {
+            if (className.indexOf(prefix) === 0) {
+                element.classList.remove(className);
+            }
+        });
+    }
+
+    function applyTheme(theme, persist) {
+        if (!body || !settings) {
+            return;
+        }
+
+        var normalized = (theme === 'dark') ? 'dark' : 'light';
+        settings.theme = normalized;
+
+        removeClassByPrefix(body, 'po-theme-');
+        body.classList.add('po-theme-' + normalized);
+
+        if (html) {
+            html.setAttribute('data-po-theme', normalized);
+        }
+
+        if (persist) {
+            setCookie('po_site_theme', normalized, settings.cookieMaxAge || (30 * 24 * 60 * 60));
+        }
+    }
+
+    function applyFont(language, fontSlug, persist) {
+        if (!body || !settings) {
+            return;
+        }
+
+        var lang = (language === 'fa') ? 'fa' : 'en';
+        var normalized = fontSlug || 'system';
+        if (!settings.currentFonts) {
+            settings.currentFonts = {};
+        }
+
+        settings.currentFonts[lang] = normalized;
+
+        removeClassByPrefix(body, 'po-font-' + lang + '-');
+        if (normalized !== 'system') {
+            body.classList.add('po-font-' + lang + '-' + normalized);
+        }
+
+        if (persist) {
+            setCookie('po_font_' + lang, normalized, settings.cookieMaxAge || (30 * 24 * 60 * 60));
+        }
+    }
+
+    function initSiteSettings() {
+        if (!settings || !body) {
+            return;
+        }
+
+
+        var container = document.querySelector('.po-site-settings');
+        if (!container) {
+            return;
+        }
+
+        var currentLanguage = settings.currentLanguage || 'en';
+        container.setAttribute('data-current-language', currentLanguage);
+
+        applyTheme(settings.theme || 'light', false);
+        var languages = ['en', 'fa'];
+        languages.forEach(function (lang) {
+            var fontSlug = (settings.currentFonts && settings.currentFonts[lang]) ? settings.currentFonts[lang] : 'system';
+            applyFont(lang, fontSlug, false);
+        });
+
+        var toggle = container.querySelector('.po-site-settings__toggle');
+        var panel = container.querySelector('.po-site-settings__panel');
+
+        if (toggle && panel) {
+            toggle.addEventListener('click', function () {
+                var isHidden = panel.hasAttribute('hidden');
+                if (isHidden) {
+                    panel.removeAttribute('hidden');
+                    toggle.setAttribute('aria-expanded', 'true');
+                } else {
+                    panel.setAttribute('hidden', 'hidden');
+                    toggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+        }
+
+        var themeSelect = container.querySelector('#po-site-settings-theme');
+        if (themeSelect) {
+            themeSelect.value = settings.theme || 'light';
+            themeSelect.addEventListener('change', function () {
+                applyTheme(this.value, true);
+            });
+        }
+
+        var fontGroups = container.querySelectorAll('.po-site-settings__group');
+        var fontSelects = container.querySelectorAll('.po-site-settings__select--font');
+
+        fontSelects.forEach(function (select) {
+            var lang = select.getAttribute('data-language') || 'en';
+            var current = (settings.currentFonts && settings.currentFonts[lang]) ? settings.currentFonts[lang] : 'system';
+            select.value = current;
+
+            select.addEventListener('change', function () {
+                applyFont(lang, this.value, true);
+            });
+        });
+
+        function syncFontVisibility(language) {
+            fontGroups.forEach(function (group) {
+                if (group.getAttribute('data-language') === language) {
+                    group.removeAttribute('hidden');
+                } else {
+                    group.setAttribute('hidden', 'hidden');
+                }
+            });
+        }
+
+        syncFontVisibility(currentLanguage);
+    }
 
     function updateProgressBars(categoryId, readCount, total) {
         var bars = document.querySelectorAll('.po-progress-bar[data-category="' + categoryId + '"]');
@@ -209,24 +339,16 @@
                 updateProgressBars(categoryId, readCount, total);
             });
         } catch (error) {
-            // Fail quietly – tracking should not break the page.
+            // Fail silently.
         }
     }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSiteSettings);
+    } else {
+        initSiteSettings();
+    }
 })(window, document);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

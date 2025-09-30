@@ -63,7 +63,7 @@ class Persian_Origins_Reading_Progress {
         }
 
         $expires = time() + MONTH_IN_SECONDS;
-        $cookie  = $this->cookie_prefix + $category_id;
+        $cookie  = $this->cookie_prefix . $category_id;
         $path    = defined('COOKIEPATH') ? (string) COOKIEPATH : '/';
         $domain  = defined('COOKIE_DOMAIN') ? (string) COOKIE_DOMAIN : '';
 
@@ -434,3 +434,4 @@ class Persian_Origins_Reading_Progress {
         return implode(' ', $sanitized);
     }
 }
+
