@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Reading progress tracking.
  *

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Plugin Name: Persian Origins Plugin
  * Plugin URI: https://persianorigins.com

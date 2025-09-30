@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Shortcodes for the plugin.
  *
