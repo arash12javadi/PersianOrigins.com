@@ -1,4 +1,5 @@
 ﻿<?php
+
 /**
  * Plugin Name: Persian Origins Plugin
  * Plugin URI: https://persianorigins.com
@@ -14,7 +15,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-final class Persian_Origins_Plugin {
+final class Persian_Origins_Plugin
+{
 
     private static $instance;
 
@@ -26,14 +28,16 @@ final class Persian_Origins_Plugin {
     private $reading_progress;
     private $shortcodes;
 
-    private function __construct() {
+    private function __construct()
+    {
         $this->define_constants();
         $this->load_dependencies();
         $this->init_components();
         $this->register_hooks();
     }
 
-    public static function instance() {
+    public static function instance()
+    {
         if (null === self::$instance) {
             self::$instance = new self();
         }
@@ -41,7 +45,8 @@ final class Persian_Origins_Plugin {
         return self::$instance;
     }
 
-    private function define_constants(): void {
+    private function define_constants(): void
+    {
         if (!defined('PERSIAN_ORIGINS_PLUGIN_VERSION')) {
             define('PERSIAN_ORIGINS_PLUGIN_VERSION', self::VERSION);
         }
@@ -59,15 +64,18 @@ final class Persian_Origins_Plugin {
         }
     }
 
-    private function load_dependencies(): void {
+    private function load_dependencies(): void
+    {
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-language-switcher.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-story-navigation.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-reading-progress.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-site-settings.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-shortcodes.php';
+        require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-po-translations.php';
     }
 
-    private function init_components(): void {
+    private function init_components(): void
+    {
         $this->language_switcher = new Persian_Origins_Language_Switcher();
         $this->story_navigation  = new Persian_Origins_Story_Navigation();
         $this->reading_progress  = new Persian_Origins_Reading_Progress();
@@ -81,16 +89,19 @@ final class Persian_Origins_Plugin {
         $this->shortcodes->register();
     }
 
-    private function register_hooks(): void {
+    private function register_hooks(): void
+    {
         add_action('plugins_loaded', [$this, 'load_textdomain']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
     }
 
-    public function load_textdomain(): void {
+    public function load_textdomain(): void
+    {
         load_plugin_textdomain('persian-origins', false, dirname(plugin_basename(__FILE__)) . '/languages');
     }
 
-    public function enqueue_assets(): void {
+    public function enqueue_assets(): void
+    {
         wp_enqueue_style(
             'persian-origins-frontend',
             PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/frontend.css',
@@ -115,7 +126,8 @@ final class Persian_Origins_Plugin {
     }
 }
 
-function persian_origins_plugin(): Persian_Origins_Plugin {
+function persian_origins_plugin(): Persian_Origins_Plugin
+{
     return Persian_Origins_Plugin::instance();
 }
 

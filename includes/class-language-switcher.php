@@ -19,17 +19,25 @@ class Persian_Origins_Language_Switcher
     {
         add_filter('body_class', [$this, 'filter_body_class']);
 
-        // // Ensure <html dir="...">
-        // add_filter('language_attributes', [$this, 'filter_language_attributes'], 10, 2);
-
-        // // Flip dir early
-        // add_action('wp_head', [$this, 'output_dir_inline_script'], 0);
+        add_filter('gettext', [$this, 'translate_text'], 10, 3);
 
         // Show floating button in footer
         add_action('wp_footer', [$this, 'render_floating_switch'], 19);
 
         // Handle switching before template loads
         add_action('template_redirect', [$this, 'maybe_handle_language_switch']);
+    }
+
+    public function translate_text($translated, $text, $domain): string
+    {
+        $lang        = $this->get_current_language();
+        $dictionary  = Persian_Origins_Translations::dictionary();
+
+        if (isset($dictionary[$lang][$text])) {
+            return $dictionary[$lang][$text];
+        }
+
+        return $translated;
     }
 
 
