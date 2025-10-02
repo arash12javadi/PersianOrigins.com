@@ -18,7 +18,6 @@ class Persian_Origins_Content
     /** Post meta keys (Persian fields) */
     const META_TITLE_FA   = '_po_title_fa';
     const META_CONTENT_FA = '_po_content_fa';
-    const META_EXCERPT_FA = '_po_excerpt_fa'; // optional, used if provided
 
     /** Term meta keys for categories (Persian fields) */
     const TERM_NAME_FA = '_po_term_name_fa';
@@ -44,7 +43,6 @@ class Persian_Origins_Content
         // Frontend title/content/excerpt swap
         add_filter('the_title', [$this, 'filter_the_title'], 10, 2);
         add_filter('the_content', [$this, 'filter_the_content'], 1);
-        add_filter('get_the_excerpt', [$this, 'filter_the_excerpt'], 10, 2);
 
         // Also fix the <title> tag for singular screens
         add_filter('document_title_parts', [$this, 'filter_document_title_parts']);
@@ -61,6 +59,9 @@ class Persian_Origins_Content
 
         // (Optional) make wp_list_categories() output FA names on frontend
         add_filter('list_cats', [$this, 'filter_list_cats'], 10, 2);
+
+        // 🔹 enqueue RTL + Shabnam admin CSS
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_styles']);
     }
 
     /* ---------------------------
@@ -86,7 +87,6 @@ class Persian_Origins_Content
         foreach ($this->post_types as $pt) {
             register_post_meta($pt, self::META_TITLE_FA, $args_title);
             register_post_meta($pt, self::META_CONTENT_FA, $args_content);
-            register_post_meta($pt, self::META_EXCERPT_FA, $args_title);
         }
     }
 
@@ -121,7 +121,6 @@ class Persian_Origins_Content
     {
         $title_fa   = get_post_meta($post->ID, self::META_TITLE_FA, true);
         $content_fa = get_post_meta($post->ID, self::META_CONTENT_FA, true);
-        $excerpt_fa = get_post_meta($post->ID, self::META_EXCERPT_FA, true);
 
         wp_nonce_field('po_save_translation_' . $post->ID, 'po_translation_nonce');
 ?>
@@ -140,13 +139,14 @@ class Persian_Origins_Content
                     'textarea_name' => 'po_content_fa',
                     'textarea_rows' => 8,
                     'media_buttons' => true,
+                    'tinymce'       => [
+                        'content_css' => PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/admin-persian-editor.css',
+                        'directionality' => 'rtl',
+                    ],
+                    'quicktags'     => true,
                 ]
             );
             ?>
-        </p>
-        <p>
-            <label for="po_excerpt_fa"><strong><?php esc_html_e('Persian Excerpt (optional)', 'persian-origins'); ?></strong></label><br>
-            <textarea id="po_excerpt_fa" name="po_excerpt_fa" rows="3" style="width:100%;"><?php echo esc_textarea($excerpt_fa); ?></textarea>
         </p>
         <p class="description">
             <?php esc_html_e('English content stays in the default Title/Content fields. Persian versions are stored here and shown on the frontend when language is Persian.', 'persian-origins'); ?>
@@ -168,9 +168,6 @@ class Persian_Origins_Content
         }
         if (isset($_POST['po_content_fa'])) {
             update_post_meta($post_id, self::META_CONTENT_FA, wp_kses_post(wp_unslash($_POST['po_content_fa'])));
-        }
-        if (isset($_POST['po_excerpt_fa'])) {
-            update_post_meta($post_id, self::META_EXCERPT_FA, sanitize_text_field(wp_unslash($_POST['po_excerpt_fa'])));
         }
     }
 
@@ -210,16 +207,6 @@ class Persian_Origins_Content
         return $content;
     }
 
-    public function filter_the_excerpt($excerpt, $post)
-    {
-        if (!is_admin() && $this->is_fa() && $post instanceof \WP_Post) {
-            $fa = get_post_meta($post->ID, self::META_EXCERPT_FA, true);
-            if (!empty($fa)) {
-                return $fa;
-            }
-        }
-        return $excerpt;
-    }
 
     public function filter_document_title_parts(array $parts): array
     {
@@ -318,5 +305,20 @@ class Persian_Origins_Content
             }
         }
         return $cat_name;
+    }
+
+    public function enqueue_admin_styles($hook)
+    {
+        // Only load on post editing screens
+        if (!in_array($hook, ['post.php', 'post-new.php'], true)) {
+            return;
+        }
+
+        wp_enqueue_style(
+            'persian-origins-admin',
+            PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/admin-persian.css',
+            [],
+            PERSIAN_ORIGINS_PLUGIN_VERSION
+        );
     }
 }
