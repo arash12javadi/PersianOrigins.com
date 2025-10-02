@@ -74,6 +74,7 @@ final class Persian_Origins_Plugin
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-shortcodes.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-po-translations.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-content.php';
+        require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-menu-translation.php';
     }
 
     private function init_components(): void
@@ -127,6 +128,11 @@ final class Persian_Origins_Plugin
         ];
 
         wp_localize_script('persian-origins-frontend', 'PersianOriginsData', $localize_data);
+    }
+
+    public function get_language_switcher(): Persian_Origins_Language_Switcher
+    {
+        return $this->language_switcher;
     }
 }
 

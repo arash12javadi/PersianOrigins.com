@@ -17,6 +17,8 @@ class Persian_Origins_Language_Switcher
 
     public function register(): void
     {
+        add_filter('locale', [$this, 'filter_locale'], 1);
+
         add_filter('body_class', [$this, 'filter_body_class']);
 
         add_filter('gettext', [$this, 'translate_text'], 10, 3);
@@ -27,6 +29,25 @@ class Persian_Origins_Language_Switcher
         // Handle switching before template loads
         add_action('template_redirect', [$this, 'maybe_handle_language_switch']);
     }
+
+    public function filter_locale($locale)
+    {
+        // Keep wp-admin using the global site language
+        if (is_admin()) {
+            return $locale;
+        }
+
+        // Use your cookie/user meta
+        $lang = $this->get_current_language(); // 'fa' or 'en'
+
+        if ($lang === 'fa') {
+            return 'fa_IR'; // Persian locale
+        }
+
+        // For English, just return the original
+        return $locale;
+    }
+
 
     public function translate_text($translated, $text, $domain): string
     {
