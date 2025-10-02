@@ -1,13 +1,14 @@
-﻿<?php
+<?php
+
 /**
  * Floating site settings (theme, fonts, direction).
  *
  * @package PersianOrigins
  */
-
 defined('ABSPATH') || exit;
 
-class Persian_Origins_Site_Settings {
+class Persian_Origins_Site_Settings
+{
 
     private $language_switcher;
 
@@ -25,12 +26,14 @@ class Persian_Origins_Site_Settings {
     private $font_cookie_prefix = 'po_font_';
     private $cookie_max_age;
 
-    public function __construct(Persian_Origins_Language_Switcher $language_switcher) {
+    public function __construct(Persian_Origins_Language_Switcher $language_switcher)
+    {
         $this->language_switcher = $language_switcher;
         $this->cookie_max_age    = YEAR_IN_SECONDS;
     }
 
-    public function register(): void {
+    public function register(): void
+    {
         $this->load_fonts_metadata();
 
         add_filter('body_class', [$this, 'filter_body_class']);
@@ -38,7 +41,8 @@ class Persian_Origins_Site_Settings {
         add_action('wp_footer', [$this, 'render_panel'], 20);
     }
 
-    public function get_script_data(): array {
+    public function get_script_data(): array
+    {
         $current_language = $this->get_current_language();
 
         return [
@@ -54,7 +58,8 @@ class Persian_Origins_Site_Settings {
         ];
     }
 
-    private function get_theme_preference(): string {
+    private function get_theme_preference(): string
+    {
         $theme = isset($_COOKIE[$this->theme_cookie])
             ? sanitize_key(wp_unslash($_COOKIE[$this->theme_cookie]))
             : '';
@@ -62,7 +67,8 @@ class Persian_Origins_Site_Settings {
         return in_array($theme, ['dark', 'light'], true) ? $theme : 'light';
     }
 
-    private function get_font_preference(string $language): string {
+    private function get_font_preference(string $language): string
+    {
         $cookie_name = $this->font_cookie_prefix . $language;
         $stored      = isset($_COOKIE[$cookie_name]) ? sanitize_key(wp_unslash($_COOKIE[$cookie_name])) : '';
 
@@ -77,17 +83,20 @@ class Persian_Origins_Site_Settings {
         return 'system';
     }
 
-    private function get_current_language(): string {
+    private function get_current_language(): string
+    {
         $language = $this->language_switcher->get_current_language();
 
         return $language ? sanitize_key($language) : 'en';
     }
 
-    private function is_rtl(): bool {
+    private function is_rtl(): bool
+    {
         return 'fa' === $this->get_current_language();
     }
 
-    private function load_fonts_metadata(): void {
+    private function load_fonts_metadata(): void
+    {
         $base_path = trailingslashit(PERSIAN_ORIGINS_PLUGIN_DIR) . 'assets/fonts';
 
         foreach (array_keys($this->fonts) as $language) {
@@ -186,15 +195,18 @@ class Persian_Origins_Site_Settings {
         }
     }
 
-    private function format_font_label(string $folder): string {
+    private function format_font_label(string $folder): string
+    {
         return ucwords(str_replace(['_', '-'], ' ', $folder));
     }
 
-    private function format_font_family(string $folder): string {
+    private function format_font_family(string $folder): string
+    {
         return str_replace(['_', '-'], ' ', $folder);
     }
 
-    private function detect_font_weight(string $name): int {
+    private function detect_font_weight(string $name): int
+    {
         $name = strtolower($name);
 
         $map = [
@@ -225,11 +237,13 @@ class Persian_Origins_Site_Settings {
         return 400;
     }
 
-    private function detect_font_style(string $name): string {
+    private function detect_font_style(string $name): string
+    {
         return (false !== stripos($name, 'italic')) ? 'italic' : 'normal';
     }
 
-    private function build_font_options(): array {
+    private function build_font_options(): array
+    {
         $options = [];
 
         foreach (array_keys($this->fonts) as $language) {
@@ -250,7 +264,8 @@ class Persian_Origins_Site_Settings {
         return $options;
     }
 
-    public function filter_body_class(array $classes): array {
+    public function filter_body_class(array $classes): array
+    {
         $theme    = $this->get_theme_preference();
         $language = $this->get_current_language();
         $font     = $this->get_font_preference($language);
@@ -266,7 +281,8 @@ class Persian_Origins_Site_Settings {
         return array_values(array_unique($classes));
     }
 
-    public function enqueue_assets(): void {
+    public function enqueue_assets(): void
+    {
         if (empty($this->fonts['en']) && empty($this->fonts['fa'])) {
             return;
         }
@@ -277,7 +293,8 @@ class Persian_Origins_Site_Settings {
         }
     }
 
-    private function generate_font_face_css(): string {
+    private function generate_font_face_css(): string
+    {
         $css = '';
 
         foreach ($this->fonts as $language => $fonts) {
@@ -305,11 +322,13 @@ class Persian_Origins_Site_Settings {
         return $css;
     }
 
-    private function escape_css_string(string $value): string {
+    private function escape_css_string(string $value): string
+    {
         return str_replace(['"', '\''], '', $value);
     }
 
-    public function render_panel(): void {
+    public function render_panel(): void
+    {
         $current_language = $this->get_current_language();
         $current_theme    = $this->get_theme_preference();
         $current_fonts    = [
@@ -317,7 +336,7 @@ class Persian_Origins_Site_Settings {
             'fa' => $this->get_font_preference('fa'),
         ];
         $font_options     = $this->build_font_options();
-        ?>
+?>
         <div class="po-site-settings" data-current-language="<?php echo esc_attr($current_language); ?>">
             <button type="button" class="po-site-settings__toggle" aria-expanded="false" aria-controls="po-site-settings-panel">
                 <span class="po-site-settings__toggle-icon" aria-hidden="true">&#9881;</span>
@@ -341,8 +360,7 @@ class Persian_Origins_Site_Settings {
                             <select
                                 id="po-site-settings-font-<?php echo esc_attr($language); ?>"
                                 class="po-site-settings__select po-site-settings__select--font"
-                                data-language="<?php echo esc_attr($language); ?>"
-                            >
+                                data-language="<?php echo esc_attr($language); ?>">
                                 <?php foreach ($options as $option) : ?>
                                     <option value="<?php echo esc_attr($option['slug']); ?>" <?php selected($option['slug'], $current_fonts[$language]); ?>>
                                         <?php echo esc_html($option['label']); ?>
@@ -354,6 +372,6 @@ class Persian_Origins_Site_Settings {
                 </div>
             </div>
         </div>
-        <?php
+<?php
     }
 }

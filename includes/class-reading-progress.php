@@ -1,4 +1,5 @@
-﻿<?php
+<?php
+
 /**
  * Reading progress tracking.
  *
@@ -7,7 +8,8 @@
 
 defined('ABSPATH') || exit;
 
-class Persian_Origins_Reading_Progress {
+class Persian_Origins_Reading_Progress
+{
 
     private $cookie_prefix = 'po_last_read_';
     private $read_cookie_prefix = 'po_read_posts_';
@@ -26,13 +28,15 @@ class Persian_Origins_Reading_Progress {
      */
     private $progress_cache = [];
 
-    public function register(): void {
+    public function register(): void
+    {
         add_action('template_redirect', [$this, 'track_progress']);
         add_action('loop_start', [$this, 'maybe_render_category_continue_button']);
         add_filter('the_content', [$this, 'prepend_progress_bar'], 5);
     }
 
-    public function track_progress(): void {
+    public function track_progress(): void
+    {
         if (!is_singular('post') || wp_doing_ajax()) {
             return;
         }
@@ -56,7 +60,8 @@ class Persian_Origins_Reading_Progress {
         }
     }
 
-    private function store_last_read(int $category_id, int $post_id): void {
+    private function store_last_read(int $category_id, int $post_id): void
+    {
         if (is_user_logged_in()) {
             update_user_meta(get_current_user_id(), $this->get_user_meta_key($category_id), $post_id);
             return;
@@ -71,7 +76,8 @@ class Persian_Origins_Reading_Progress {
         $_COOKIE[$cookie] = (string) $post_id;
     }
 
-    private function mark_post_as_read(int $category_id, int $post_id): void {
+    private function mark_post_as_read(int $category_id, int $post_id): void
+    {
         if (is_user_logged_in()) {
             $key        = $this->get_user_read_posts_key($category_id);
             $read_posts = get_user_meta(get_current_user_id(), $key, true);
@@ -94,7 +100,8 @@ class Persian_Origins_Reading_Progress {
         unset($this->read_cache[$category_id], $this->progress_cache[$category_id]);
     }
 
-    private function store_guest_read_posts(int $category_id, array $post_ids): void {
+    private function store_guest_read_posts(int $category_id, array $post_ids): void
+    {
         $post_ids = array_values(array_unique(array_map('absint', $post_ids)));
         $post_ids = array_filter($post_ids);
         if (empty($post_ids)) {
@@ -116,15 +123,18 @@ class Persian_Origins_Reading_Progress {
         $_COOKIE[$cookie_name] = $value;
     }
 
-    private function get_user_meta_key(int $category_id): string {
+    private function get_user_meta_key(int $category_id): string
+    {
         return '_last_read_' . $category_id;
     }
 
-    private function get_user_read_posts_key(int $category_id): string {
+    private function get_user_read_posts_key(int $category_id): string
+    {
         return '_read_posts_' . $category_id;
     }
 
-    public function maybe_render_category_continue_button($query): void {
+    public function maybe_render_category_continue_button($query): void
+    {
         if (!($query instanceof \WP_Query) || !$query->is_main_query() || !is_category() || wp_doing_ajax()) {
             return;
         }
@@ -140,7 +150,8 @@ class Persian_Origins_Reading_Progress {
         }
     }
 
-    public function prepend_progress_bar($content) {
+    public function prepend_progress_bar($content)
+    {
         if (!is_singular('post') || !in_the_loop() || !is_main_query()) {
             return $content;
         }
@@ -165,7 +176,8 @@ class Persian_Origins_Reading_Progress {
         return $markup . $content;
     }
 
-    public function build_continue_button(int $category_id, array $atts = []): string {
+    public function build_continue_button(int $category_id, array $atts = []): string
+    {
         $active = $this->get_continue_button_markup($category_id, $atts);
         if ($active) {
             return $active;
@@ -179,7 +191,8 @@ class Persian_Origins_Reading_Progress {
         return '';
     }
 
-    public function get_continue_button_markup(int $category_id, array $atts = []): string {
+    public function get_continue_button_markup(int $category_id, array $atts = []): string
+    {
         $defaults = [
             'class' => '',
         ];
@@ -214,7 +227,8 @@ class Persian_Origins_Reading_Progress {
         );
     }
 
-    public function get_disabled_continue_button_markup(\WP_Term $category, array $atts = []): string {
+    public function get_disabled_continue_button_markup(\WP_Term $category, array $atts = []): string
+    {
         $defaults = [
             'class' => '',
         ];
@@ -234,7 +248,8 @@ class Persian_Origins_Reading_Progress {
         );
     }
 
-    private function get_last_read_post_id(int $category_id): int {
+    private function get_last_read_post_id(int $category_id): int
+    {
         if (is_user_logged_in()) {
             $saved = get_user_meta(get_current_user_id(), $this->get_user_meta_key($category_id), true);
             return $saved ? (int) $saved : 0;
@@ -248,7 +263,8 @@ class Persian_Origins_Reading_Progress {
         return 0;
     }
 
-    public function get_script_data(): array {
+    public function get_script_data(): array
+    {
         if (!is_singular('post')) {
             return [];
         }
@@ -290,7 +306,8 @@ class Persian_Origins_Reading_Progress {
         ];
     }
 
-    private function get_category_progress(int $category_id): array {
+    private function get_category_progress(int $category_id): array
+    {
         if (isset($this->progress_cache[$category_id])) {
             return $this->progress_cache[$category_id];
         }
@@ -316,7 +333,8 @@ class Persian_Origins_Reading_Progress {
         return $progress;
     }
 
-    private function build_progress_bar_markup(int $category_id): string {
+    private function build_progress_bar_markup(int $category_id): string
+    {
         $progress = $this->get_category_progress($category_id);
         if (empty($progress['total'])) {
             return '';
@@ -352,7 +370,8 @@ class Persian_Origins_Reading_Progress {
         return (string) apply_filters('persian_origins_progress_bar_markup', $markup, $progress, $category_id);
     }
 
-    private function get_category_total_posts(int $category_id): int {
+    private function get_category_total_posts(int $category_id): int
+    {
         $term = get_term($category_id, 'category');
         if ($term instanceof \WP_Term) {
             return (int) $term->count;
@@ -361,7 +380,8 @@ class Persian_Origins_Reading_Progress {
         return 0;
     }
 
-    private function get_read_posts_for_current_user(int $category_id): array {
+    private function get_read_posts_for_current_user(int $category_id): array
+    {
         if (isset($this->read_cache[$category_id])) {
             return $this->read_cache[$category_id];
         }
@@ -405,7 +425,8 @@ class Persian_Origins_Reading_Progress {
         return $existing;
     }
 
-    private function get_guest_read_posts(int $category_id): array {
+    private function get_guest_read_posts(int $category_id): array
+    {
         $cookie = $this->read_cookie_prefix . $category_id;
         if (empty($_COOKIE[$cookie])) {
             return [];
@@ -422,7 +443,8 @@ class Persian_Origins_Reading_Progress {
         return array_values(array_unique($parts));
     }
 
-    private function sanitize_class_attribute(string $class): string {
+    private function sanitize_class_attribute(string $class): string
+    {
         $classes = preg_split('/\s+/', trim($class));
         if (!$classes) {
             return '';
@@ -434,4 +456,3 @@ class Persian_Origins_Reading_Progress {
         return implode(' ', $sanitized);
     }
 }
-
