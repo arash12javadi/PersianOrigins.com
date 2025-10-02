@@ -156,6 +156,12 @@ class Persian_Origins_Reading_Progress
             return $content;
         }
 
+        static $already_output = false;
+        if ($already_output) {
+            return $content;
+        }
+        $already_output = true;
+
         $categories = get_the_category();
         if (empty($categories)) {
             return $content;

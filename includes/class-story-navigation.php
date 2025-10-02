@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Story navigation component.
  *
@@ -7,16 +8,25 @@
 
 defined('ABSPATH') || exit;
 
-class Persian_Origins_Story_Navigation {
+class Persian_Origins_Story_Navigation
+{
 
-    public function register(): void {
+    public function register(): void
+    {
         add_filter('the_content', [$this, 'append_story_navigation']);
     }
 
-    public function append_story_navigation($content) {
+    public function append_story_navigation($content)
+    {
         if (!is_singular('post') || !in_the_loop() || !is_main_query()) {
             return $content;
         }
+
+        static $already_output = false;
+        if ($already_output) {
+            return $content;
+        }
+        $already_output = true;
 
         $navigation = $this->build_navigation_markup();
         if (!$navigation) {
@@ -26,7 +36,9 @@ class Persian_Origins_Story_Navigation {
         return $content . $navigation;
     }
 
-    private function build_navigation_markup(): string {
+
+    private function build_navigation_markup(): string
+    {
         $previous_post = get_adjacent_post(true, '', true);
         $next_post     = get_adjacent_post(true, '', false);
 
@@ -48,7 +60,7 @@ class Persian_Origins_Story_Navigation {
         }
 
         ob_start();
-        ?>
+?>
         <nav class="po-story-nav" aria-label="<?php echo esc_attr__('Story navigation', 'persian-origins'); ?>">
             <?php if ($has_previous) : ?>
                 <a class="<?php echo esc_attr($prev_classes); ?>" href="<?php echo esc_url($prev_url); ?>" rel="prev">
@@ -70,7 +82,7 @@ class Persian_Origins_Story_Navigation {
                 </span>
             <?php endif; ?>
         </nav>
-        <?php
+<?php
 
         return (string) ob_get_clean();
     }
