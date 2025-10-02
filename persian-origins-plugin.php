@@ -28,6 +28,7 @@ final class Persian_Origins_Plugin
     private $reading_progress;
     private $shortcodes;
     private $content;
+    private $excerpt_translation;
 
     private function __construct()
     {
@@ -75,6 +76,7 @@ final class Persian_Origins_Plugin
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-po-translations.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-content.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-menu-translation.php';
+        require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-excerpt-translation.php';
     }
 
     private function init_components(): void
@@ -85,6 +87,7 @@ final class Persian_Origins_Plugin
         $this->site_settings     = new Persian_Origins_Site_Settings($this->language_switcher);
         $this->shortcodes        = new Persian_Origins_Shortcodes($this->language_switcher, $this->reading_progress);
         $this->content           = new Persian_Origins_Content($this->language_switcher);
+        $this->excerpt_translation = new Persian_Origins_Excerpt_Translation();
 
         $this->language_switcher->register();
         $this->story_navigation->register();
@@ -92,6 +95,7 @@ final class Persian_Origins_Plugin
         $this->site_settings->register();
         $this->shortcodes->register();
         $this->content->register();
+        $this->excerpt_translation->register();
     }
 
     private function register_hooks(): void
