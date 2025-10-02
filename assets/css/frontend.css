@@ -2,6 +2,22 @@
    Persian Origins – Frontend CSS
    ================================ */
 
+/* --- Shabnam font (Regular + Bold) --- */
+@font-face {
+  font-family: "Shabnam";
+  src: url("../fonts/fa/shabnam-font-v2.4.0/Shabnam.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Shabnam";
+  src: url("../fonts/fa/shabnam-font-v2.4.0/Shabnam-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ---------- Language Switch ---------- */
 .po-language-switch {
   position: fixed;
@@ -43,7 +59,7 @@
   transform: translateY(-1px);
 }
 
-/* ---------- Story Navigation ---------- */
+/* ---------- Story Navigation (EN defaults) ---------- */
 .po-story-nav {
   display: flex;
   justify-content: space-between;
@@ -272,6 +288,7 @@ body.po-dir-rtl .post-content,
 body.po-dir-rtl .post-content * {
   direction: rtl;
   text-align: right;
+  font-family: "Shabnam", Tahoma, Arial, sans-serif !important;
 }
 
 /* Force LTR for post content when needed */
@@ -322,4 +339,162 @@ body.po-dir-rtl .po-site-settings {
     right: auto;
     left: 1rem;
   }
+}
+
+/* =====================================
+   Persian (FA) – Navigation & Progress
+   ===================================== */
+
+/* Flip arrow-like icons if you add them with ::before later */
+.po-story-nav.po-story-nav--fa .po-story-nav__button::before {
+  transform: scaleX(-1);
+}
+
+/* Persian story navigation mirrors EN visually, but RTL */
+.po-story-nav.po-story-nav--fa {
+  display: flex;
+  flex-direction: row-reverse; /* flip button order */
+  justify-content: space-between; /* same spacing as EN */
+  gap: 1rem;
+  margin-top: 2rem;
+  direction: rtl;
+  text-align: right;
+  font-family: "Shabnam", Tahoma, Arial, sans-serif;
+}
+
+/* Buttons match EN sizing & layout, centered text, Shabnam font */
+.po-story-nav.po-story-nav--fa .po-story-nav__button {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-family: "Shabnam", Tahoma, Arial, sans-serif;
+  direction: rtl;
+  text-align: center;
+}
+
+/* Ensure Elementor/Theme can’t override critical alignment */
+body.po-lang-fa .po-story-nav.po-story-nav--fa {
+  direction: rtl !important;
+  text-align: right !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  gap: 1rem !important;
+  margin-top: 2rem !important;
+}
+
+/* Progress bar uses Shabnam and RTL in FA */
+body.po-lang-fa .po-progress-bar {
+  font-family: "Shabnam", Tahoma, Arial, sans-serif !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+body.po-lang-fa .po-progress-bar__meta,
+body.po-lang-fa .po-progress-bar__counts {
+  justify-content: space-between !important;
+}
+
+/* =====================================
+   Persian Origins – Fix Story Navigation
+   ===================================== */
+
+/* 1) Normalize nav children:
+   - kill <p> wrappers as boxes
+   - kill stray <br> that break alignment
+   - remove default margins/padding */
+.po-story-nav p {
+  display: contents; /* children participate directly in flex */
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.po-story-nav br {
+  display: none !important;
+}
+
+/* 2) Make only the actual buttons flex items (a/span with the button class) */
+.po-story-nav > a.po-story-nav__button,
+.po-story-nav > span.po-story-nav__button,
+.po-story-nav p > a.po-story-nav__button,
+.po-story-nav p > span.po-story-nav__button {
+  flex: 1 1 0; /* equal width columns */
+  min-width: 0; /* allow shrinking without overflow */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: #222222;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+/* Hover/disabled states remain identical */
+.po-story-nav > a.po-story-nav__button:hover,
+.po-story-nav > a.po-story-nav__button:focus,
+.po-story-nav p > a.po-story-nav__button:hover,
+.po-story-nav p > a.po-story-nav__button:focus {
+  background: #444444;
+}
+.po-story-nav > .po-story-nav__button.is-disabled,
+.po-story-nav p > .po-story-nav__button.is-disabled {
+  background: #e1e1e1;
+  color: #777777;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+/* 3) Base nav layout (EN) — unchanged */
+.po-story-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch; /* ensure equal height */
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+/* 4) Persian mode: mirror the EN layout using RTL & row-reverse */
+.po-story-nav.po-story-nav--fa {
+  direction: rtl; /* bidi direction */
+  text-align: right;
+  display: flex !important;
+  flex-direction: row-reverse; /* flips visual order (Next on left) */
+  justify-content: space-between !important;
+  align-items: stretch;
+  gap: 1rem;
+  margin-top: 2rem;
+  font-family: "Shabnam", Tahoma, Arial, sans-serif;
+}
+
+/* 5) Ensure the buttons themselves in FA inherit the same sizing/centering */
+.po-story-nav.po-story-nav--fa > a.po-story-nav__button,
+.po-story-nav.po-story-nav--fa > span.po-story-nav__button,
+.po-story-nav.po-story-nav--fa p > a.po-story-nav__button,
+.po-story-nav.po-story-nav--fa p > span.po-story-nav__button {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  direction: rtl;
+  font-family: "Shabnam", Tahoma, Arial, sans-serif;
+}
+
+/* 6) Optional: if you add arrow icons via ::before, flip them in FA */
+.po-story-nav.po-story-nav--fa .po-story-nav__button::before {
+  transform: scaleX(-1);
+}
+
+/* 7) Progress bar stays RTL + Shabnam in FA (unchanged but kept here for completeness) */
+body.po-lang-fa .po-progress-bar {
+  font-family: "Shabnam", Tahoma, Arial, sans-serif !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+body.po-lang-fa .po-progress-bar__meta,
+body.po-lang-fa .po-progress-bar__counts {
+  justify-content: space-between !important;
 }

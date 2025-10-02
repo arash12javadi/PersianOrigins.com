@@ -10,6 +10,13 @@ defined('ABSPATH') || exit;
 
 class Persian_Origins_Story_Navigation
 {
+    private $language_switcher;
+
+    public function __construct(Persian_Origins_Language_Switcher $language_switcher)
+    {
+        $this->language_switcher = $language_switcher;
+    }
+
 
     public function register(): void
     {
@@ -36,7 +43,6 @@ class Persian_Origins_Story_Navigation
         return $content . $navigation;
     }
 
-
     private function build_navigation_markup(): string
     {
         $previous_post = get_adjacent_post(true, '', true);
@@ -51,6 +57,11 @@ class Persian_Origins_Story_Navigation
         $prev_classes = 'po-story-nav__button';
         $next_classes = 'po-story-nav__button';
 
+        // Detect current language using the injected dependency
+        $lang_class = ($this->language_switcher->get_current_language() === 'fa')
+            ? 'po-story-nav--fa'
+            : 'po-story-nav--en';
+
         if (!$has_previous) {
             $prev_classes .= ' is-disabled';
         }
@@ -59,9 +70,10 @@ class Persian_Origins_Story_Navigation
             $next_classes .= ' is-disabled';
         }
 
+
         ob_start();
 ?>
-        <nav class="po-story-nav" aria-label="<?php echo esc_attr__('Story navigation', 'persian-origins'); ?>">
+        <nav class="po-story-nav <?php echo esc_attr($lang_class); ?>" aria-label="<?php echo esc_attr__('Story navigation', 'persian-origins'); ?>">
             <?php if ($has_previous) : ?>
                 <a class="<?php echo esc_attr($prev_classes); ?>" href="<?php echo esc_url($prev_url); ?>" rel="prev">
                     <?php esc_html_e('Previous', 'persian-origins'); ?>

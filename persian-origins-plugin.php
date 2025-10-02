@@ -79,7 +79,7 @@ final class Persian_Origins_Plugin
     private function init_components(): void
     {
         $this->language_switcher = new Persian_Origins_Language_Switcher();
-        $this->story_navigation  = new Persian_Origins_Story_Navigation();
+        $this->story_navigation = new Persian_Origins_Story_Navigation($this->language_switcher);
         $this->reading_progress  = new Persian_Origins_Reading_Progress();
         $this->site_settings     = new Persian_Origins_Site_Settings($this->language_switcher);
         $this->shortcodes        = new Persian_Origins_Shortcodes($this->language_switcher, $this->reading_progress);
