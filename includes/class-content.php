@@ -316,3 +316,58 @@ class Persian_Origins_Content
         );
     }
 }
+
+//--------------------------- Category sort from old to new and versa ---------------------------//
+
+class Persian_Origins_Category_Order
+{
+    public static function init()
+    {
+        add_action('pre_get_posts', [__CLASS__, 'modify_query']);
+        add_action('loop_start', [__CLASS__, 'render_order_dropdown']);
+    }
+
+    /**
+     * Adjust query ordering on category pages.
+     */
+    public static function modify_query($query)
+    {
+        if (!is_admin() && $query->is_main_query() && $query->is_category()) {
+            $order = isset($_GET['order']) ? sanitize_key($_GET['order']) : 'newest';
+            if ($order === 'oldest') {
+                $query->set('order', 'ASC');
+            } else {
+                $query->set('order', 'DESC');
+            }
+        }
+    }
+
+    /**
+     * Render dropdown before the posts loop.
+     */
+    public static function render_order_dropdown($query)
+    {
+        if (!($query instanceof \WP_Query) || !$query->is_main_query() || !is_category()) {
+            return;
+        }
+
+        $current = isset($_GET['order']) ? sanitize_key($_GET['order']) : 'newest';
+
+        echo '<form method="get" class="po-order-form" style="margin-bottom:1em">';
+        echo '<label for="po-order-select" style="margin-right:.5em">' . esc_html__('Sort by:', 'persian-origins') . '</label>';
+        echo '<select name="order" id="po-order-select" onchange="this.form.submit()">';
+        echo '<option value="newest"' . selected($current, 'newest', false) . '>' . esc_html__('Newest to Oldest', 'persian-origins') . '</option>';
+        echo '<option value="oldest"' . selected($current, 'oldest', false) . '>' . esc_html__('Oldest to Newest', 'persian-origins') . '</option>';
+        echo '</select>';
+
+        // Preserve other query vars (like pagination or filters)
+        foreach ($_GET as $key => $val) {
+            if ($key === 'order') continue;
+            echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_attr($val) . '">';
+        }
+
+        echo '</form>';
+    }
+}
+
+Persian_Origins_Category_Order::init();

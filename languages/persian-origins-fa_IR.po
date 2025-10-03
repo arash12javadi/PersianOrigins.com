@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Persian Origins Plugin\n"
-"POT-Creation-Date: 2025-10-03 12:20+0100\n"
-"PO-Revision-Date: 2025-10-03 12:34+0100\n"
+"POT-Creation-Date: 2025-10-03 21:05+0100\n"
+"PO-Revision-Date: 2025-10-03 21:07+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fa_IR\n"
@@ -47,6 +47,18 @@ msgstr "نام به پارسی"
 msgid "Persian Description (FA)"
 msgstr "توضیحات به پارسی"
 
+#: includes/class-content.php:357
+msgid "Sort by:"
+msgstr "نمایش بر اساس:"
+
+#: includes/class-content.php:359
+msgid "Newest to Oldest"
+msgstr "جدیدترین مطلب"
+
+#: includes/class-content.php:360
+msgid "Oldest to Newest"
+msgstr "قدیمی ترین مطلب"
+
 #: includes/class-language-switcher.php:162
 msgid "Persian"
 msgstr "پارسی"
@@ -58,10 +70,6 @@ msgstr "English"
 #: includes/class-language-switcher.php:166
 msgid "Switch to Persian"
 msgstr "تغییر به پارسی"
-
-#: includes/class-language-switcher.php:167
-msgid "Switch to English"
-msgstr "Switch to English"
 
 #: includes/class-language-switcher.php:177
 #, php-format
@@ -78,12 +86,17 @@ msgstr "ادامه مطاله"
 msgid "Continue reading %s"
 msgstr "ادامه مطالعه %s"
 
-#: includes/class-reading-progress.php:374
+#: includes/class-reading-progress.php:384
 #, php-format
 msgid "Reading progress for %s"
+msgstr "میزان مطالعه شما از %s"
+
+#: includes/class-reading-progress.php:388
+#, php-format
+msgid "میزان مطالعه شما از %s"
 msgstr ""
 
-#: includes/class-reading-progress.php:378
+#: includes/class-reading-progress.php:391
 msgid "Reading progress"
 msgstr "میزان مطاله"
 
@@ -171,3 +184,6 @@ msgstr ""
 #. Author of the plugin/theme
 msgid "Persian Origins"
 msgstr ""
+
+#~ msgid "Switch to English"
+#~ msgstr "Switch to English"

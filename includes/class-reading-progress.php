@@ -361,6 +361,7 @@ class Persian_Origins_Reading_Progress
         return $progress;
     }
 
+
     private function build_progress_bar_markup(int $category_id): string
     {
         $progress = $this->get_category_progress($category_id);
@@ -369,14 +370,27 @@ class Persian_Origins_Reading_Progress
         }
 
         $term = get_term($category_id, 'category');
+
         if ($term instanceof \WP_Term) {
-            $label = sprintf(
-                esc_html__('Reading progress for %s', 'persian-origins'),
-                esc_html($term->name)
-            );
+            // Fetch Persian title (if available)
+            $name_en = $term->name;
+            $name_fa = get_term_meta($category_id, Persian_Origins_Category_Meta::META_NAME_FA, true);
+            if (!$name_fa) {
+                $name_fa = $name_en;
+            }
+
+            // Output both (toggled via .po-text--en / .po-text--fa)
+            $label  = '<span class="po-text--en">' .
+                sprintf(esc_html__('Reading progress for %s', 'persian-origins'), esc_html($name_en)) .
+                '</span>';
+
+            $label .= '<span class="po-text--fa">' .
+                sprintf(esc_html__('میزان مطالعه شما از %s', 'persian-origins'), esc_html($name_fa)) .
+                '</span>';
         } else {
             $label = esc_html__('Reading progress', 'persian-origins');
         }
+
         $percentage      = (int) $progress['percentage'];
         $percentage_text = number_format_i18n($percentage) . '%';
         $read_count      = (int) $progress['read_count'];
@@ -397,6 +411,8 @@ class Persian_Origins_Reading_Progress
 
         return (string) apply_filters('persian_origins_progress_bar_markup', $markup, $progress, $category_id);
     }
+
+
 
     private function get_category_total_posts(int $category_id): int
     {
