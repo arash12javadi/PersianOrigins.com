@@ -242,9 +242,47 @@ class Persian_Origins_Site_Settings
         return (false !== stripos($name, 'italic')) ? 'italic' : 'normal';
     }
 
+    // private function build_font_options(): array
+    // {
+    //     $options = [];
+
+    //     foreach (array_keys($this->fonts) as $language) {
+    //         $options[$language]   = [];
+    //         $options[$language][] = [
+    //             'slug'  => 'system',
+    //             'label' => __('System default', 'persian-origins'),
+    //         ];
+
+    //         foreach ($this->fonts[$language] as $slug => $font) {
+    //             $options[$language][] = [
+    //                 'slug'  => $slug,
+    //                 'label' => $font['label'],
+    //             ];
+    //         }
+    //     }
+
+    //     return $options;
+    // }
+
     private function build_font_options(): array
     {
         $options = [];
+
+        // Persian label overrides by slug
+        $fa_labels = [
+            'vazir'         => 'وزیر',
+            'vazir-bold'    => 'وزیر بولد',
+            'sahel'         => 'ساحل',
+            'sahel-bold'    => 'ساحل بولد',
+            'samim'         => 'صمیم',
+            'samim-bold'    => 'صمیم بولد',
+            'shabnam'       => 'شبنم',
+            'shabnam-bold'  => 'شبنم بولد',
+            'tanha'         => 'تنها',
+            'parastoo'      => 'پرستو',
+            'parastoo-bold' => 'پرستو بولد',
+            // add more if you add new folders/slugs
+        ];
 
         foreach (array_keys($this->fonts) as $language) {
             $options[$language]   = [];
@@ -254,15 +292,26 @@ class Persian_Origins_Site_Settings
             ];
 
             foreach ($this->fonts[$language] as $slug => $font) {
+                $label = $font['label'];
+
+                // If Persian, override with our Persian names when available
+                if ($language === 'fa' && isset($fa_labels[$slug])) {
+                    $label = $fa_labels[$slug];
+                }
+
                 $options[$language][] = [
                     'slug'  => $slug,
-                    'label' => $font['label'],
+                    'label' => $label,
                 ];
             }
         }
 
+        // Keep this so you can still tweak labels with a filter if needed
+        $options = apply_filters('persian_origins_font_options', $options);
+
         return $options;
     }
+
 
     public function filter_body_class(array $classes): array
     {
