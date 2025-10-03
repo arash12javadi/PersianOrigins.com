@@ -56,6 +56,17 @@
     document.cookie = cookie;
   }
 
+  // ---- LANGUAGE COOKIE HELPER ----
+  function setLangCookie(lang) {
+    if (!lang) return;
+    var maxAge = 365 * 24 * 60 * 60; // 1 year
+    var cookie = "po_lang=" + encodeURIComponent(lang) + ";path=/;SameSite=Lax;max-age=" + maxAge;
+    if (window.location && window.location.protocol === "https:") {
+      cookie += ";secure";
+    }
+    document.cookie = cookie;
+  }
+
   function getCookie(name) {
     if (!name) {
       return "";
@@ -263,6 +274,12 @@
     }
 
     syncFontVisibility(currentLanguage);
+
+    // Listen for custom language switch events (if you already have them)
+    document.addEventListener("poLangChange", function (e) {
+      var lang = e.detail && e.detail.lang ? e.detail.lang : "en";
+      setLangCookie(lang);
+    });
   }
 
   function updateProgressBars(categoryId, readCount, total) {

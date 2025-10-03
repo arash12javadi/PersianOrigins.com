@@ -77,6 +77,7 @@ final class Persian_Origins_Plugin
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-content.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-menu-translation.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-excerpt-translation.php';
+        require_once PERSIAN_ORIGINS_PLUGIN_DIR . '/includes/class-po-category-meta.php';
     }
 
     private function init_components(): void

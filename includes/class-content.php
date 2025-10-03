@@ -47,12 +47,6 @@ class Persian_Origins_Content
         // Also fix the <title> tag for singular screens
         add_filter('document_title_parts', [$this, 'filter_document_title_parts']);
 
-        // Categories: fields in admin + save
-        add_action('category_add_form_fields', [$this, 'render_category_add_fields']);
-        add_action('category_edit_form_fields', [$this, 'render_category_edit_fields']);
-        add_action('created_category', [$this, 'save_category_meta']);
-        add_action('edited_category', [$this, 'save_category_meta']);
-
         // Categories: swap the shown name/description on the frontend
         add_filter('single_cat_title', [$this, 'filter_single_cat_title']);
         add_filter('category_description', [$this, 'filter_category_description']);
