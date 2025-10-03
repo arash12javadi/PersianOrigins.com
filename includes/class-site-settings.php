@@ -315,7 +315,9 @@ class Persian_Origins_Site_Settings
                 }
 
                 $fallback = ('fa' === $language) ? '"Tahoma", "Arial", sans-serif' : '"Helvetica Neue", Arial, sans-serif';
-                $css     .= 'body.po-lang-' . $language . '.' . $font['class'] . '{font-family:"' . $family . '",' . $fallback . ';}';
+                $css .= 'body.po-lang-' . $language . '.' . $font['class'] . ','
+                    . 'body.po-lang-' . $language . '.' . $font['class'] . ' *'
+                    . '{font-family:"' . $family . '",' . $fallback . ' !important;}';
             }
         }
 
@@ -370,6 +372,16 @@ class Persian_Origins_Site_Settings
                         </div>
                     <?php endforeach; ?>
                 </div>
+                <div class="po-site-settings__section">
+                    <label class="po-site-settings__label" id="po-font-size-label">Text size</label>
+                    <div class="po-site-settings__font-size-controls" role="group" aria-labelledby="po-font-size-label">
+                        <button type="button" class="po-site-settings__btn po-font-size--decrease" aria-label="Decrease text size">A−</button>
+                        <output id="po-font-size-output" class="po-site-settings__font-size-output" aria-live="polite">100%</output>
+                        <button type="button" class="po-site-settings__btn po-font-size--increase" aria-label="Increase text size">A+</button>
+                        <button type="button" class="po-site-settings__btn po-font-size--reset" aria-label="Reset text size">Reset</button>
+                    </div>
+                </div>
+
             </div>
         </div>
 <?php
