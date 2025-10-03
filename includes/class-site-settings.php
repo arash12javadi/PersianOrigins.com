@@ -357,7 +357,9 @@ class Persian_Origins_Site_Settings
                     <?php foreach ($font_options as $language => $options) : ?>
                         <div class="po-site-settings__group" data-language="<?php echo esc_attr($language); ?>" <?php echo ($language === $current_language) ? '' : 'hidden'; ?>>
                             <label for="po-site-settings-font-<?php echo esc_attr($language); ?>" class="po-site-settings__sub-label">
-                                <?php echo ('fa' === $language) ? esc_html__('Persian font', 'persian-origins') : esc_html__('English font', 'persian-origins'); ?>
+                                <?php echo ('fa' === $language)
+                                    ? esc_html__('Persian font', 'persian-origins')
+                                    : esc_html__('English font', 'persian-origins'); ?>
                             </label>
                             <select
                                 id="po-site-settings-font-<?php echo esc_attr($language); ?>"
@@ -373,17 +375,19 @@ class Persian_Origins_Site_Settings
                     <?php endforeach; ?>
                 </div>
                 <div class="po-site-settings__section">
-                    <label class="po-site-settings__label" id="po-font-size-label">Text size</label>
+                    <label class="po-site-settings__label" id="po-font-size-label"><?php esc_html_e('Text size', 'persian-origins'); ?></label>
                     <div class="po-site-settings__font-size-controls" role="group" aria-labelledby="po-font-size-label">
-                        <button type="button" class="po-site-settings__btn po-font-size--decrease" aria-label="Decrease text size">A−</button>
+                        <button type="button" class="po-site-settings__btn po-font-size--decrease" aria-label="<?php esc_attr_e('Decrease text size', 'persian-origins'); ?>">A−</button>
                         <output id="po-font-size-output" class="po-site-settings__font-size-output" aria-live="polite">100%</output>
-                        <button type="button" class="po-site-settings__btn po-font-size--increase" aria-label="Increase text size">A+</button>
-                        <button type="button" class="po-site-settings__btn po-font-size--reset" aria-label="Reset text size">Reset</button>
+                        <button type="button" class="po-site-settings__btn po-font-size--increase" aria-label="<?php esc_attr_e('Increase text size', 'persian-origins'); ?>">A+</button>
+                        <button type="button" class="po-site-settings__btn po-font-size--reset" aria-label="<?php esc_attr_e('Reset text size', 'persian-origins'); ?>">
+                            <?php esc_html_e('Reset', 'persian-origins'); ?>
+                        </button>
                     </div>
                 </div>
-
             </div>
         </div>
+
 <?php
     }
 }

@@ -214,22 +214,34 @@ class Persian_Origins_Reading_Progress
             return '';
         }
 
-        $term  = get_term($category_id, 'category');
-        $label = esc_html__('Continue Reading', 'persian-origins');
+        $term = get_term($category_id, 'category');
+
+        // Load Persian name from term meta
+        $name_fa = get_term_meta($category_id, 'po_name_fa', true);
+
+        // English + Persian labels
+        $label_en = esc_html__('Continue Reading', 'persian-origins');
+        $label_fa = 'ادامه مطالعه';
+
         if ($term instanceof \WP_Term) {
-            $label = sprintf(
+            $label_en = sprintf(
                 esc_html__('Continue reading %s', 'persian-origins'),
                 esc_html($term->name)
+            );
+            $label_fa = sprintf(
+                'ادامه مطالعه %s',
+                esc_html($name_fa ?: $term->name) // fallback to EN if no FA set
             );
         }
 
         $class = $this->sanitize_class_attribute('po-continue-reading__link ' . $atts['class']);
 
         return sprintf(
-            '<a class="%1$s" href="%2$s">%3$s</a>',
+            '<a class="%1$s" href="%2$s"><span class="po-text--en">%3$s</span><span class="po-text--fa">%4$s</span></a>',
             esc_attr($class),
             esc_url($permalink),
-            $label
+            $label_en,
+            $label_fa
         );
     }
 
@@ -242,17 +254,27 @@ class Persian_Origins_Reading_Progress
 
         $class = $this->sanitize_class_attribute('po-continue-reading__link is-disabled ' . $atts['class']);
 
-        $label = sprintf(
+        // Load Persian name from term meta
+        $name_fa = get_term_meta($category->term_id, 'po_name_fa', true);
+
+        // English + Persian labels
+        $label_en = sprintf(
             esc_html__('Continue reading %s', 'persian-origins'),
             esc_html($category->name)
         );
+        $label_fa = sprintf(
+            'ادامه مطالعه %s',
+            esc_html($name_fa ?: $category->name) // fallback to EN if no FA set
+        );
 
         return sprintf(
-            '<span class="%1$s" aria-disabled="true">%2$s</span>',
+            '<span class="%1$s" aria-disabled="true"><span class="po-text--en">%2$s</span><span class="po-text--fa">%3$s</span></span>',
             esc_attr($class),
-            $label
+            $label_en,
+            $label_fa
         );
     }
+
 
     private function get_last_read_post_id(int $category_id): int
     {

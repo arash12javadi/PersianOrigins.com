@@ -164,7 +164,7 @@ class Persian_Origins_Language_Switcher
 
         $target_label = ($target_lang === 'fa')
             ? __('Switch to Persian', 'persian-origins')
-            : __('Switch to English', 'persian-origins');
+            : 'Switch to English';
 
         // Markup
         $markup = sprintf(

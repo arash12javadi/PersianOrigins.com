@@ -1,0 +1,173 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Persian Origins Plugin\n"
+"POT-Creation-Date: 2025-10-03 12:20+0100\n"
+"PO-Revision-Date: 2025-10-03 12:34+0100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fa_IR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.2\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n==0 || n==1);\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: persian-origins-plugin.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;"
+"_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: includes/class-content.php:105
+msgid "Persian Translation (FA)"
+msgstr "ترجمه به پارسی"
+
+#: includes/class-content.php:122 includes/class-menu-translation.php:12
+msgid "Persian Title"
+msgstr "سرتیتر پارسی"
+
+#: includes/class-content.php:126
+msgid "Persian Content"
+msgstr "متن پارسی"
+
+#: includes/class-content.php:146
+msgid ""
+"English content stays in the default Title/Content fields. Persian versions "
+"are stored here and shown on the frontend when language is Persian."
+msgstr ""
+
+#: includes/class-content.php:226 includes/class-content.php:242
+msgid "Persian Name (FA)"
+msgstr "نام به پارسی"
+
+#: includes/class-content.php:230 includes/class-content.php:246
+msgid "Persian Description (FA)"
+msgstr "توضیحات به پارسی"
+
+#: includes/class-language-switcher.php:162
+msgid "Persian"
+msgstr "پارسی"
+
+#: includes/class-language-switcher.php:163
+msgid "English"
+msgstr "English"
+
+#: includes/class-language-switcher.php:166
+msgid "Switch to Persian"
+msgstr "تغییر به پارسی"
+
+#: includes/class-language-switcher.php:167
+msgid "Switch to English"
+msgstr "Switch to English"
+
+#: includes/class-language-switcher.php:177
+#, php-format
+msgid "Current: %s"
+msgstr "زبان فعلی: %s"
+
+#: includes/class-reading-progress.php:223
+msgid "Continue Reading"
+msgstr "ادامه مطاله"
+
+#: includes/class-reading-progress.php:228
+#: includes/class-reading-progress.php:262
+#, php-format
+msgid "Continue reading %s"
+msgstr "ادامه مطالعه %s"
+
+#: includes/class-reading-progress.php:374
+#, php-format
+msgid "Reading progress for %s"
+msgstr ""
+
+#: includes/class-reading-progress.php:378
+msgid "Reading progress"
+msgstr "میزان مطاله"
+
+#: includes/class-site-settings.php:253
+msgid "System default"
+msgstr "تنظیمات اصلی"
+
+#: includes/class-site-settings.php:345
+msgid "Site settings"
+msgstr "تنظیمات نگارشی"
+
+#: includes/class-site-settings.php:349
+msgid "Theme"
+msgstr "پوسته"
+
+#: includes/class-site-settings.php:351
+msgid "Light"
+msgstr "روشن"
+
+#: includes/class-site-settings.php:352
+msgid "Dark"
+msgstr "تاریک"
+
+#: includes/class-site-settings.php:356
+msgid "Font"
+msgstr "فونت"
+
+#: includes/class-site-settings.php:361
+msgid "Persian font"
+msgstr "فونت فارسی"
+
+#: includes/class-site-settings.php:362
+msgid "English font"
+msgstr "فونت انگلیسی"
+
+#: includes/class-site-settings.php:378
+msgid "Text size"
+msgstr "سایز متن"
+
+#: includes/class-site-settings.php:380
+msgid "Decrease text size"
+msgstr "کاهش سایز متن"
+
+#: includes/class-site-settings.php:382
+msgid "Increase text size"
+msgstr "افزایش سایز متن"
+
+#: includes/class-site-settings.php:383
+msgid "Reset text size"
+msgstr "بازنشانی سایز متن"
+
+#: includes/class-site-settings.php:384
+msgid "Reset"
+msgstr "بازنشانی"
+
+#: includes/class-story-navigation.php:76
+msgid "Story navigation"
+msgstr "نوار مطالعه"
+
+#: includes/class-story-navigation.php:79
+#: includes/class-story-navigation.php:83
+msgid "Previous"
+msgstr "قبلی"
+
+#: includes/class-story-navigation.php:89
+#: includes/class-story-navigation.php:93
+msgid "Next"
+msgstr "بعدی"
+
+#. Plugin Name of the plugin/theme
+msgid "Persian Origins Plugin"
+msgstr ""
+
+#. Plugin URI of the plugin/theme
+#. Author URI of the plugin/theme
+msgid "https://persianorigins.com"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Provides bilingual language switching, story navigation, reading progress "
+"tracking, and frontend preferences for Persian Origins."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "Persian Origins"
+msgstr ""
