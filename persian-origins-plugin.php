@@ -29,6 +29,7 @@ final class Persian_Origins_Plugin
     private $shortcodes;
     private $content;
     private $excerpt_translation;
+    private $cookie_popup;
 
     private function __construct()
     {
@@ -78,6 +79,7 @@ final class Persian_Origins_Plugin
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-menu-translation.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-excerpt-translation.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . '/includes/class-po-category-meta.php';
+        require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-cookie-popup.php';
     }
 
     private function init_components(): void
@@ -97,6 +99,8 @@ final class Persian_Origins_Plugin
         $this->shortcodes->register();
         $this->content->register();
         $this->excerpt_translation->register();
+        $this->cookie_popup = new Persian_Origins_Cookie_Popup();
+        $this->cookie_popup->register();
     }
 
     private function register_hooks(): void
