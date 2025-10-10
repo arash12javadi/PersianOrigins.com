@@ -20,7 +20,7 @@ Adds semantic classes to <body> (e.g. po-lang-fa, po-dir-rtl).
 
 Per-language fonts (dynamic @font-face)
 
-Auto-discovers fonts in assets/fonts/en/* and assets/fonts/fa/* (WOFF/WOFF2).
+Auto-discovers fonts in assets/fonts/en/_ and assets/fonts/fa/_ (WOFF/WOFF2).
 
 Detects weight/style from filename (e.g. Bold, Italic).
 
@@ -74,9 +74,8 @@ Copy the plugin folder to wp-content/plugins/persian-origins/.
 
 Ensure your fonts live under:
 
-assets/fonts/en/<your-font-folder>/*.woff, *.woff2
-assets/fonts/fa/<your-font-folder>/*.woff, *.woff2
-
+assets/fonts/en/<your-font-folder>/_.woff, _.woff2
+assets/fonts/fa/<your-font-folder>/_.woff, _.woff2
 
 Activate Persian Origins Plugin from WP Admin → Plugins.
 
@@ -138,16 +137,16 @@ Tab button with circular flag overlap (FA/EN).
 Sliding panel with “Current: …” and the switch link.
 
 Switch URL
-Uses po_switch_language=<fa|en> + _po_lang_nonce (nonce is present in code—enable in prod) and po_redirect (base64).
+Uses po_switch_language=<fa|en> + \_po_lang_nonce (nonce is present in code—enable in prod) and po_redirect (base64).
 
 Persistence
 
-Logged-in: user meta _preferred_language.
+Logged-in: user meta \_preferred_language.
 
 Guests: cookie po_preferred_language (also sets po_lang for legacy compatibility).
 
 Translation mapping
-If viewing a singular post, attempts to find a translation via _translation_of post meta (both directions supported).
+If viewing a singular post, attempts to find a translation via \_translation_of post meta (both directions supported).
 
 Filters
 
@@ -158,13 +157,13 @@ persian_origins_show_auto_language_switch – Gate auto switch rendering (if you
 Site settings (Persian_Origins_Site_Settings)
 
 Fonts metadata
-Scans assets/fonts/{en,fa}/* folders, builds variants (weight/style detection from filenames), produces @font-face and scoping rules:
+Scans assets/fonts/{en,fa}/\* folders, builds variants (weight/style detection from filenames), produces @font-face and scoping rules:
 
 Body-level (only when the matching language is active):
-body.po-lang-<lang>.po-font-<lang>-<slug> (+ *) → applies font globally for that language.
+body.po-lang-<lang>.po-font-<lang>-<slug> (+ \*) → applies font globally for that language.
 
 Article-level:
-article[data-font-<lang>="<slug>"] (+ *) → used by JS for previews and fine targeting.
+article[data-font-<lang>="<slug>"] (+ \*) → used by JS for previews and fine targeting.
 
 CSS generation
 Inline style appended to the po-fa-overrides handle, ordered after base styles.
@@ -194,7 +193,7 @@ persian_origins_font_options( $options ) – Alter how fonts are labeled in the 
 Front-end script (assets/js/frontend.js)
 
 Theme early paint
-Reads localStorage/cookie → sets <html data-theme> and body.po-theme-* before DOM ready.
+Reads localStorage/cookie → sets <html data-theme> and body.po-theme-\* before DOM ready.
 
 Site settings init
 
@@ -224,58 +223,57 @@ Writes po_preferred_language (and legacy po_lang) so PHP code stays in sync.
 
 File/Folder structure (relevant parts)
 assets/
-  css/
-    base.css
-    components.language-switch.css
-    components.site-settings.css
-    components.story.css
-    direction.css          # scopes RTL to post content, keeps widgets LTR
-    fa.overrides.css       # handle for inline font CSS
-    util.fontawesome.css
-  fonts/
-    en/
-      Open_Sans/
-        OpenSans-Regular.woff2
-        OpenSans-Bold.woff2
-        ...
-    fa/
-      Vazir/
-        Vazir-Regular.woff2
-        Vazir-Bold.woff2
-        ...
-  img/
-    en-flag-w50.png
-    fa-flag-w50.png
-  js/
-    frontend.js
+css/
+base.css
+components.language-switch.css
+components.site-settings.css
+components.story.css
+direction.css # scopes RTL to post content, keeps widgets LTR
+fa.overrides.css # handle for inline font CSS
+util.fontawesome.css
+fonts/
+en/
+Open_Sans/
+OpenSans-Regular.woff2
+OpenSans-Bold.woff2
+...
+fa/
+Vazir/
+Vazir-Regular.woff2
+Vazir-Bold.woff2
+...
+img/
+en-flag-w50.png
+fa-flag-w50.png
+js/
+frontend.js
 
 includes/
-  class-language-switcher.php
-  class-site-settings.php
-  class-story-navigation.php
-  class-reading-progress.php
-  class-shortcodes.php
-  class-po-translations.php
-  class-content.php
-  class-menu-translation.php
-  class-excerpt-translation.php
-  class-po-category-meta.php
-  class-cookie-popup.php
+class-language-switcher.php
+class-site-settings.php
+class-story-navigation.php
+class-reading-progress.php
+class-shortcodes.php
+class-po-translations.php
+class-content.php
+class-menu-translation.php
+class-excerpt-translation.php
+class-po-category-meta.php
+class-cookie-popup.php
 
-persian-origins-plugin.php   # main loader
+persian-origins-plugin.php # main loader
 
 Adding fonts
 
 Create a folder under assets/fonts/en/ or assets/fonts/fa/, e.g.:
 
 assets/fonts/en/open-sans/
-  OpenSans-Regular.woff2
-  OpenSans-Italic.woff2
-  OpenSans-SemiBold.woff2
-  OpenSans-Bold.woff2
+OpenSans-Regular.woff2
+OpenSans-Italic.woff2
+OpenSans-SemiBold.woff2
+OpenSans-Bold.woff2
 
-
-The folder name → slug (open-sans), and readable family/label (spacing by -/_).
+The folder name → slug (open-sans), and readable family/label (spacing by -/\_).
 
 The file names should include weight/style keywords so detection works:
 
@@ -363,7 +361,7 @@ All state is persisted in cookies and localStorage; server work is minimal.
 
 Security notes
 
-Re-enable the _po_lang_nonce verification in maybe_handle_language_switch() before production.
+Re-enable the \_po_lang_nonce verification in maybe_handle_language_switch() before production.
 
 All inputs (query/cookies/meta) are sanitized and escaped before output.
 
