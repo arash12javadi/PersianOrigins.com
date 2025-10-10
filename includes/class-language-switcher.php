@@ -261,11 +261,10 @@ class Persian_Origins_Language_Switcher
             $language = 'en';
         }
 
-        // TEMP: disable nonce check for testing
-        // $nonce = isset($_GET['_po_lang_nonce']) ? sanitize_text_field(wp_unslash($_GET['_po_lang_nonce'])) : '';
-        // if (!wp_verify_nonce($nonce, 'po_switch_language')) {
-        //     wp_die(__('Invalid language switch request.', 'persian-origins'));
-        // }
+        $nonce = isset($_GET['_po_lang_nonce']) ? sanitize_text_field(wp_unslash($_GET['_po_lang_nonce'])) : '';
+        if (!wp_verify_nonce($nonce, 'po_switch_language')) {
+            wp_die(__('Invalid language switch request.', 'persian-origins'));
+        }
 
         $this->persist_language_preference($language);
 
