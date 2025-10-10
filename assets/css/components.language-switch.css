@@ -151,12 +151,8 @@ div.po-switch-wrap > button:focus {
 }
 
 /* -------- Optional: small-screen tweaks (keep left-pinned) -------- */
-@media (max-width: 600px) {
+@media (max-width: 992px) {
   .po-switch-wrap {
     top: 0.75rem;
-  }
-  .po-language-switch.lang-switch-btn.po-language-switch--floating {
-    top: 0;
-    left: -270px; /* stay left-pinned even on RTL */
   }
 }

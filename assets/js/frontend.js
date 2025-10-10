@@ -231,8 +231,11 @@
 
     var toggle = container.querySelector(".po-site-settings__toggle");
     var panel = container.querySelector(".po-site-settings__panel");
+
     if (toggle && panel) {
-      toggle.addEventListener("click", function () {
+      // open/close on click
+      toggle.addEventListener("click", function (e) {
+        e.stopPropagation();
         var isHidden = panel.hasAttribute("hidden");
         if (isHidden) {
           panel.removeAttribute("hidden");
@@ -241,6 +244,35 @@
           panel.setAttribute("hidden", "hidden");
           toggle.setAttribute("aria-expanded", "false");
         }
+      });
+
+      // close on outside click
+      document.addEventListener("click", function (e) {
+        if (!container.contains(e.target)) {
+          if (!panel.hasAttribute("hidden")) {
+            panel.setAttribute("hidden", "hidden");
+            toggle.setAttribute("aria-expanded", "false");
+          }
+        }
+      });
+
+      // close on Escape
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && !panel.hasAttribute("hidden")) {
+          panel.setAttribute("hidden", "hidden");
+          toggle.setAttribute("aria-expanded", "false");
+          toggle.focus();
+        }
+      });
+
+      // press animation state
+      toggle.addEventListener("mousedown", function () {
+        toggle.classList.add("is-pressing");
+      });
+      ["mouseup", "mouseleave", "blur"].forEach(function (ev) {
+        toggle.addEventListener(ev, function () {
+          toggle.classList.remove("is-pressing");
+        });
       });
     }
 

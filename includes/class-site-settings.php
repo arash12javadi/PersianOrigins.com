@@ -422,7 +422,7 @@ class Persian_Origins_Site_Settings
 ?>
         <div class="po-site-settings" data-current-language="<?php echo esc_attr($current_language); ?>">
             <button type="button" class="po-site-settings__toggle" aria-expanded="false" aria-controls="po-site-settings-panel">
-                <span class="po-site-settings__toggle-icon" aria-hidden="true">&#9881;</span>
+                <span class="po-site-settings__toggle-icon" aria-hidden="true">⚙️</span>
                 <span class="po-site-settings__toggle-label"><?php esc_html_e('Site settings', 'persian-origins'); ?></span>
             </button>
             <div class="po-site-settings__panel" id="po-site-settings-panel" hidden>
