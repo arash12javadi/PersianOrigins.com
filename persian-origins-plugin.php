@@ -116,13 +116,64 @@ final class Persian_Origins_Plugin
 
     public function enqueue_assets(): void
     {
+        // Styles (ordered)
         wp_enqueue_style(
-            'persian-origins-frontend',
-            PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/frontend.css',
+            'po-base',
+            PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/base.css',
             [],
             self::VERSION
         );
 
+        wp_enqueue_style(
+            'po-fonts-shabnam',
+            PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/fonts-shabnam.css',
+            ['po-base'],
+            self::VERSION
+        );
+
+        wp_enqueue_style(
+            'po-language-switch',
+            PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/components.language-switch.css',
+            ['po-base'],
+            self::VERSION
+        );
+
+        wp_enqueue_style(
+            'po-story',
+            PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/components.story.css',
+            ['po-base'],
+            self::VERSION
+        );
+
+        wp_enqueue_style(
+            'po-site-settings',
+            PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/components.site-settings.css',
+            ['po-base'],
+            self::VERSION
+        );
+
+        wp_enqueue_style(
+            'po-direction',
+            PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/direction.css',
+            ['po-base'],
+            self::VERSION
+        );
+
+        wp_enqueue_style(
+            'po-fa-overrides',
+            PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/fa.overrides.css',
+            ['po-base', 'po-fonts-shabnam'],
+            self::VERSION
+        );
+
+        wp_enqueue_style(
+            'po-util-fa',
+            PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/util.fontawesome.css',
+            [],
+            self::VERSION
+        );
+
+        // Scripts
         wp_enqueue_script(
             'persian-origins-frontend',
             PERSIAN_ORIGINS_PLUGIN_URL . 'assets/js/frontend.js',
@@ -138,6 +189,7 @@ final class Persian_Origins_Plugin
 
         wp_localize_script('persian-origins-frontend', 'PersianOriginsData', $localize_data);
     }
+
 
     public function get_language_switcher(): Persian_Origins_Language_Switcher
     {

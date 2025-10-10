@@ -1,0 +1,156 @@
+/* ---------- Story Navigation (EN defaults) ---------- */
+.po-story-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.po-story-nav__button {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: #222222;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.po-story-nav__button:hover,
+.po-story-nav__button:focus {
+  background: #444444;
+}
+
+.po-story-nav__button.is-disabled {
+  background: #e1e1e1;
+  color: #777777;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+/* ---------- Continue Reading ---------- */
+.po-continue-reading {
+  margin: 1.5rem 0;
+}
+
+.po-continue-reading__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  background: #c78421;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.po-continue-reading__link:hover,
+.po-continue-reading__link:focus {
+  background: #a86a1b;
+  transform: translateY(-1px);
+}
+.po-continue-reading__link.is-disabled {
+  background: #ececec;
+  color: #777777;
+  pointer-events: none;
+  transform: none;
+}
+
+/* ---------- Progress Bar ---------- */
+.po-progress-bar {
+  margin-bottom: 1.5rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.po-progress-bar__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #222222;
+}
+
+.po-progress-bar__track {
+  position: relative;
+  width: 100%;
+  height: 0.75rem;
+  border-radius: 999px;
+  background: #e5e5ea;
+  overflow: hidden;
+}
+.po-progress-bar__track[role="progressbar"] {
+  outline: none;
+}
+
+.po-progress-bar__fill {
+  position: absolute;
+  inset: 0;
+  width: 0;
+  background: #5c1ae6;
+  border-radius: inherit;
+  transition: width 0.35s ease;
+}
+
+.po-progress-bar__counts {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: #666666;
+  font-weight: 500;
+}
+.po-progress-bar__numbers {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ---------- Normalize story-nav markup ---------- */
+.po-story-nav p {
+  display: contents;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.po-story-nav br {
+  display: none !important;
+}
+
+.po-story-nav > a.po-story-nav__button,
+.po-story-nav > span.po-story-nav__button,
+.po-story-nav p > a.po-story-nav__button,
+.po-story-nav p > span.po-story-nav__button {
+  flex: 1 1 0;
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: #222222;
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.2s ease, opacity 0.2s ease;
+}
+.po-story-nav > a.po-story-nav__button:hover,
+.po-story-nav > a.po-story-nav__button:focus,
+.po-story-nav p > a.po-story-nav__button:hover,
+.po-story-nav p > a.po-story-nav__button:focus {
+  background: #444444;
+}
+.po-story-nav > .po-story-nav__button.is-disabled,
+.po-story-nav p > .po-story-nav__button.is-disabled {
+  background: #e1e1e1;
+  color: #777777;
+  pointer-events: none;
+  opacity: 0.65;
+}

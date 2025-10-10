@@ -338,9 +338,19 @@ class Persian_Origins_Site_Settings
 
         $css = $this->generate_font_face_css();
         if ($css) {
-            wp_add_inline_style('persian-origins-frontend', $css);
+            // Make sure the handle exists before adding inline CSS
+            if (!wp_style_is('po-fa-overrides', 'enqueued')) {
+                wp_enqueue_style(
+                    'po-fa-overrides',
+                    PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/fa.overrides.css',
+                    ['po-base', 'po-fonts-shabnam'],
+                    PERSIAN_Origins_Plugin::VERSION
+                );
+            }
+            wp_add_inline_style('po-fa-overrides', $css);
         }
     }
+
 
     private function generate_font_face_css(): string
     {

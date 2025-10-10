@@ -1,0 +1,26 @@
+/* Make sure FA renders consistently */
+.fa,
+.fas,
+.far,
+.fab,
+.fal,
+.fad,
+.fa-solid,
+.fa-regular,
+.fa-light,
+.fa-thin,
+.fa-brands,
+.fa-duotone,
+.fa::before,
+.fas::before,
+.far::before,
+.fab::before,
+.fa-solid::before,
+.fa-regular::before,
+.fa-light::before,
+.fa-thin::before,
+.fa-brands::before,
+.fa-duotone::before {
+  font-family: var(--fa-style-family, "Font Awesome 6 Free") !important;
+  font-weight: var(--fa-style, 900) !important;
+}

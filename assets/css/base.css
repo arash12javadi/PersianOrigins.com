@@ -1,0 +1,48 @@
+/* ==== THEME VARIABLES (scoped to the article) ==== */
+#post-section > div > div > article {
+  --po-bg: #ffffff;
+  --po-surface: #f7f7f7;
+  --po-text: #111111;
+  --po-muted: #666666;
+  --po-border: #e5e5e5;
+  --po-link: #0a58ca;
+  --po-link-hover: #084298;
+
+  background: var(--po-bg);
+  color: var(--po-text);
+}
+
+/* Dark overrides */
+#post-section > div > div > article[data-theme="dark"] {
+  color-scheme: dark;
+  --po-bg: #0f0f10;
+  --po-surface: #17181a;
+  --po-text: #f1f1f1;
+  --po-muted: #b8b8b8;
+  --po-border: #2b2d31;
+  --po-link: #7ab0ff;
+  --po-link-hover: #a9c8ff;
+}
+
+/* Typical inner elements */
+#post-section > div > div > article a {
+  color: var(--po-link);
+}
+#post-section > div > div > article a:hover,
+#post-section > div > div > article a:focus {
+  color: var(--po-link-hover);
+}
+
+#post-section > div > div > article hr,
+#post-section > div > div > article .wp-block-separator,
+#post-section > div > div > article .separator {
+  border-color: var(--po-border);
+}
+
+#post-section > div > div > article .card,
+#post-section > div > div > article .widget,
+#post-section > div > div > article .po-site-settings__panel {
+  background: var(--po-surface);
+  color: var(--po-text);
+  border-color: var(--po-border);
+}

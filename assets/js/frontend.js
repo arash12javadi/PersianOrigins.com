@@ -184,22 +184,23 @@
   }
 
   function applyFont(language, fontSlug, persist) {
-    if (!body || !settings) {
-      return;
-    }
+    if (!body || !settings) return;
 
     var lang = language === "fa" ? "fa" : "en";
     var normalized = fontSlug || "system";
-    if (!settings.currentFonts) {
-      settings.currentFonts = {};
-    }
-
+    if (!settings.currentFonts) settings.currentFonts = {};
     settings.currentFonts[lang] = normalized;
 
+    // keep the body class if you like
     removeClassByPrefix(body, "po-font-" + lang + "-");
     if (normalized !== "system") {
       body.classList.add("po-font-" + lang + "-" + normalized);
     }
+
+    // NEW: write the chosen font onto each article so CSS can target it
+    themableArticles.forEach(function (article) {
+      article.setAttribute("data-font-" + lang, normalized);
+    });
 
     if (persist) {
       setCookie("po_font_" + lang, normalized, settings.cookieMaxAge || 30 * 24 * 60 * 60);
@@ -279,6 +280,19 @@
     document.addEventListener("poLangChange", function (e) {
       var lang = e.detail && e.detail.lang ? e.detail.lang : "en";
       setLangCookie(lang);
+
+      // reflect current language on the settings panel (if present)
+      var container = document.querySelector(".po-site-settings");
+      if (container) container.setAttribute("data-current-language", lang);
+
+      // re-show the correct font dropdown group
+      if (typeof syncFontVisibility === "function") {
+        syncFontVisibility(lang);
+      }
+
+      // re-apply the stored font for that language to the articles
+      var chosen = settings.currentFonts && settings.currentFonts[lang] ? settings.currentFonts[lang] : "system";
+      applyFont(lang, chosen, false);
     });
   }
 

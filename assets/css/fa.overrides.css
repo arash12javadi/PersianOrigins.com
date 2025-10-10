@@ -1,0 +1,43 @@
+/* =====================================
+   Persian (FA) – Navigation & Progress
+   ===================================== */
+
+/* Optional if using arrow icons later */
+.po-story-nav.po-story-nav--fa .po-story-nav__button::before {
+  transform: scaleX(-1);
+}
+
+/* Persian story navigation mirrors EN visually, but RTL */
+.po-story-nav.po-story-nav--fa {
+  display: flex !important;
+  flex-direction: row-reverse;
+  justify-content: space-between !important;
+  align-items: stretch;
+  gap: 1rem;
+  margin-top: 2rem;
+  direction: rtl;
+  text-align: right;
+  font-family: "Shabnam", Tahoma, Arial, sans-serif;
+}
+
+/* Ensure buttons inherit sizing/centering + Shabnam */
+.po-story-nav.po-story-nav--fa > a.po-story-nav__button,
+.po-story-nav.po-story-nav--fa > span.po-story-nav__button,
+.po-story-nav.po-story-nav--fa p > a.po-story-nav__button,
+.po-story-nav.po-story-nav--fa p > span.po-story-nav__button {
+  flex: 1 1 0;
+  min-width: 0;
+  text-align: center;
+  direction: rtl;
+  font-family: "Shabnam", Tahoma, Arial, sans-serif;
+}
+
+/* Progress bar uses Shabnam and RTL in FA */
+body.po-lang-fa .po-progress-bar {
+  direction: rtl !important;
+  text-align: right !important;
+}
+body.po-lang-fa .po-progress-bar__meta,
+body.po-lang-fa .po-progress-bar__counts {
+  justify-content: space-between !important;
+}

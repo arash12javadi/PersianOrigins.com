@@ -1,0 +1,63 @@
+/* =====================================
+   Direction: only flip POST CONTENT
+   ===================================== */
+
+/* Flip RTL for post content containers only */
+body.po-dir-rtl .entry-content,
+body.po-dir-rtl .entry-content *,
+body.po-dir-rtl .post-content,
+body.po-dir-rtl .post-content * {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Force LTR for post content when needed */
+body.po-dir-ltr .entry-content,
+body.po-dir-ltr .entry-content *,
+body.po-dir-ltr .post-content,
+body.po-dir-ltr .post-content * {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Keep language switch & site-settings always LTR */
+body.po-dir-rtl .po-language-switch,
+body.po-dir-rtl .po-language-switch *,
+body.po-dir-rtl .po-site-settings,
+body.po-dir-rtl .po-site-settings * {
+  direction: ltr;
+  text-align: left;
+}
+
+/* Move floating widgets to the left in RTL */
+body.po-dir-rtl .po-language-switch {
+  right: auto;
+  left: 1rem;
+  top: 10rem;
+  flex-direction: row-reverse;
+}
+body.po-dir-rtl .po-site-settings {
+  right: auto;
+  left: 1.5rem;
+}
+
+/* ---------- Responsive tweaks ---------- */
+@media (max-width: 600px) {
+  .po-language-switch {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+  body.po-dir-rtl .po-language-switch {
+    right: auto;
+    left: 0.75rem;
+  }
+
+  .po-site-settings {
+    bottom: 1rem;
+    right: 1rem;
+  }
+  body.po-dir-rtl .po-site-settings {
+    right: auto;
+    left: 1rem;
+  }
+}
