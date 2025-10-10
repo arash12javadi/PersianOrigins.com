@@ -4,6 +4,269 @@ Provides a bilingual front-end experience for PersianOrigins.com: language switc
 
 The plugin is built to be theme-agnostic, a11y-friendly, and performant (no heavy frameworks, lazy CSS, font-display: swap).
 
+## Shortcodes Documentation
+
+The plugin registers three shortcodes for bilingual content management.
+
+---
+
+## [language_switch]
+
+Renders the language switcher UI with flag icons and toggle functionality.
+
+### Syntax
+
+```
+[language_switch]
+```
+
+### Attributes
+
+| Attribute    | Type   | Description                               |
+| ------------ | ------ | ----------------------------------------- |
+| `class`      | string | Extra CSS classes for the wrapper element |
+| `link_class` | string | Extra CSS classes for the switch link     |
+
+### Examples
+
+**Basic usage:**
+
+```
+[language_switch]
+```
+
+**With custom classes:**
+
+```
+[language_switch class="my-switch my-switch--inline" link_class="btn btn-primary"]
+```
+
+### Notes
+
+- Respects current language context
+- Swaps flag images in DOM order for consistent stacking
+- Links to opposite language page or safe fallback
+- Works in pages, posts, and shortcode-enabled widgets
+- Styled by plugin's global CSS
+
+---
+
+## [continue_reading]
+
+Displays a "Continue Reading" button that directs users to the next unread post in a category.
+
+### Syntax
+
+```
+[continue_reading category="category-slug"]
+```
+
+### Attributes
+
+| Attribute  | Type       | Required | Description                          |
+| ---------- | ---------- | -------- | ------------------------------------ |
+| `category` | string/int | **Yes**  | Category slug or ID                  |
+| `class`    | string     | No       | Extra CSS classes for button wrapper |
+
+### Examples
+
+**With category slug:**
+
+```
+[continue_reading category="history"]
+```
+
+**With category ID:**
+
+```
+[continue_reading category="42"]
+```
+
+**With custom styling:**
+
+```
+[continue_reading category="history" class="btn btn-accent w-full"]
+```
+
+### Behavior
+
+- Tracks read posts via localStorage with cookie fallback
+- Returns empty string if category is invalid
+- Calculates next unread post within specified category
+- Reading progress is per-browser (not server-side)
+- May point to first post if all posts are read
+
+---
+
+## [po_categories]
+
+Renders a responsive grid of categories with bilingual titles, descriptions, and optional images.
+
+### Syntax
+
+```
+[po_categories]
+```
+
+### Attributes
+
+| Attribute    | Type    | Default    | Description                         |
+| ------------ | ------- | ---------- | ----------------------------------- |
+| `taxonomy`   | string  | `category` | WordPress taxonomy slug             |
+| `include`    | string  | —          | Comma-separated term IDs to include |
+| `exclude`    | string  | —          | Comma-separated term IDs to exclude |
+| `hide_empty` | boolean | `false`    | Hide terms with no posts            |
+| `number`     | int     | —          | Limit number of terms displayed     |
+| `orderby`    | string  | `name`     | Sort field (name, count, etc.)      |
+| `order`      | string  | `ASC`      | Sort direction (ASC or DESC)        |
+| `columns`    | int     | `3`        | Grid columns (1-6)                  |
+| `image_size` | string  | `medium`   | WordPress image size                |
+| `parent`     | int     | —          | Filter by parent ID (0 = top-level) |
+
+### Examples
+
+**Default 3-column grid:**
+
+```
+[po_categories]
+```
+
+**4 columns with 12 items:**
+
+```
+[po_categories columns="4" hide_empty="true" number="12"]
+```
+
+**Specific tags with thumbnails:**
+
+```
+[po_categories taxonomy="post_tag" include="3,7,12" columns="6" image_size="thumbnail"]
+```
+
+**Top-level categories by post count:**
+
+```
+[po_categories parent="0" order="DESC" orderby="count"]
+```
+
+**Include specific categories:**
+
+```
+[po_categories include="5,8,12,15" columns="4"]
+```
+
+**Exclude specific categories:**
+
+```
+[po_categories exclude="1,2,3" hide_empty="true"]
+```
+
+### Output Structure
+
+```html
+<div class="po-cat-grid cols-4">
+  <article class="po-cat-card">
+    <a class="po-cat-card__media" href="/category/history/">
+      <img src="..." alt="..." />
+    </a>
+    <div class="po-cat-card__body">
+      <h3 class="po-cat-title">
+        <a href="/category/history/">
+          <span class="po-text--en">History</span>
+          <span class="po-text--fa">تاریخ</span>
+        </a>
+      </h3>
+      <div class="po-cat-desc">
+        <div class="po-text--en"><p>English description…</p></div>
+        <div class="po-text--fa"><p>توضیح فارسی…</p></div>
+      </div>
+    </div>
+  </article>
+  <!-- Additional cards -->
+</div>
+```
+
+### Bilingual Content
+
+- **English:** Uses term's native `name` and `description`
+- **Persian:** Pulls from custom term meta (`name_fa`, `desc_fa`) with EN fallback
+- **Language visibility:** Controlled by body classes
+  - `body.po-lang-en .po-text--fa { display:none }`
+  - `body.po-lang-fa .po-text--en { display:none }`
+
+### Images
+
+- Retrieves featured image from term meta
+- Uses `wp_get_attachment_image()` with specified size
+- Falls back gracefully if no image exists
+
+---
+
+## Styling
+
+### CSS Classes Available
+
+**Language Switch:**
+
+- `.po-language-switch` - Root wrapper
+- Custom classes via `class` and `link_class` attributes
+
+**Continue Reading:**
+
+- `.po-continue-reading` - Button wrapper
+- Custom classes via `class` attribute
+
+**Categories Grid:**
+
+- `.po-cat-grid` - Grid container
+- `.po-cat-grid.cols-N` - Column variants (N = 1-6)
+- `.po-cat-card` - Individual card
+- `.po-cat-card__media` - Image wrapper
+- `.po-cat-card__body` - Content wrapper
+- `.po-cat-title` - Title heading
+- `.po-cat-desc` - Description wrapper
+- `.po-text--en` - English text
+- `.po-text--fa` - Persian text
+
+---
+
+## Best Practices
+
+1. **Sanitization:** All attributes are sanitized automatically
+2. **Invalid Input:** Returns empty string instead of errors
+3. **Custom CSS:** Add theme overrides after plugin styles
+4. **Class Attributes:** Use space-separated valid class names
+5. **Language Toggle:** Both languages render; body class controls visibility
+
+---
+
+## Common Use Cases
+
+**Sidebar language switcher:**
+
+```
+[language_switch class="sidebar-widget"]
+```
+
+**Category archive with continue reading:**
+
+```
+[po_categories category="articles" columns="3"]
+[continue_reading category="articles" class="mt-4"]
+```
+
+**Featured categories homepage:**
+
+```
+[po_categories include="5,7,9,12" columns="4" image_size="large" hide_empty="true"]
+```
+
+**Tag cloud alternative:**
+
+```
+[po_categories taxonomy="post_tag" orderby="count" order="DESC" number="20" columns="5"]
+```
+
 ## Features
 
 ### Language switcher (EN ⇄ FA)
