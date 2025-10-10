@@ -20,7 +20,7 @@ final class Persian_Origins_Plugin
 
     private static $instance;
 
-    const VERSION = '1.0.0';
+    const VERSION = '251010';
 
     private $language_switcher;
     private $site_settings;
