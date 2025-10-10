@@ -336,20 +336,22 @@ class Persian_Origins_Site_Settings
             return;
         }
 
+        // Ensure the base handle exists (main plugin enqueues this already).
+        if (!wp_style_is('po-fa-overrides', 'enqueued')) {
+            wp_enqueue_style(
+                'po-fa-overrides',
+                PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/fa.overrides.css',
+                ['po-base'],
+                Persian_Origins_Plugin::VERSION
+            );
+        }
+
         $css = $this->generate_font_face_css();
         if ($css) {
-            // Make sure the handle exists before adding inline CSS
-            if (!wp_style_is('po-fa-overrides', 'enqueued')) {
-                wp_enqueue_style(
-                    'po-fa-overrides',
-                    PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/fa.overrides.css',
-                    ['po-base', 'po-fonts-shabnam'],
-                    PERSIAN_Origins_Plugin::VERSION
-                );
-            }
             wp_add_inline_style('po-fa-overrides', $css);
         }
     }
+
 
 
     private function generate_font_face_css(): string
@@ -358,13 +360,14 @@ class Persian_Origins_Site_Settings
 
         foreach ($this->fonts as $language => $fonts) {
             foreach ($fonts as $font) {
-                $family = $this->escape_css_string($font['family']);
+                $family = $this->escape_css_string($font['family']); // e.g., "Open Sans"
 
+                // --- 1) @font-face blocks ---
                 foreach ($font['variants'] as $variant) {
-                    $style  = ('italic' === $variant['style']) ? 'italic' : 'normal';
+                    $style  = ($variant['style'] === 'italic') ? 'italic' : 'normal';
                     $weight = (int) $variant['weight'];
 
-                    $css .= '@font-face {';
+                    $css .= '@font-face{';
                     $css .= 'font-family:"' . $family . '";';
                     $css .= 'font-style:' . $style . ';';
                     $css .= 'font-weight:' . $weight . ';';
@@ -373,15 +376,34 @@ class Persian_Origins_Site_Settings
                     $css .= '}';
                 }
 
-                $fallback = ('fa' === $language) ? '"Tahoma", "Arial", sans-serif' : '"Helvetica Neue", Arial, sans-serif';
-                $css .= 'body.po-lang-' . $language . '.' . $font['class'] . ','
-                    . 'body.po-lang-' . $language . '.' . $font['class'] . ' *'
-                    . '{font-family:"' . $family . '",' . $fallback . ' !important;}';
+                // --- 2) Apply rules ---
+                $slug     = $font['slug'];          // folder -> slug (e.g. Open_Sans -> open-sans)
+                $class    = $font['class'];         // e.g. po-font-en-open-sans
+                $fallback = ($language === 'fa')
+                    ? '"Tahoma","Arial",sans-serif'
+                    : '"Helvetica Neue",Arial,sans-serif';
+
+                /* A) BODY class — only when that language is active.
+             *    This prevents FA body rules from overriding EN pages and vice-versa.
+             */
+                $css .= 'body.po-lang-' . $language . '.' . $class . ','
+                    .  'body.po-lang-' . $language . '.' . $class . ' *'
+                    .  '{font-family:"' . $family . '",' . $fallback . ' !important;}';
+
+                /* B) ARTICLE attribute — JS writes data-font-<lang>="<slug>".
+             *    Works for previews and fine-grained targeting inside content.
+             */
+                $css .= 'article[data-font-' . $language . '="' . $slug . '"],'
+                    .  'article[data-font-' . $language . '="' . $slug . '"] *'
+                    .  '{font-family:"' . $family . '",' . $fallback . ' !important;}';
             }
         }
 
         return $css;
     }
+
+
+
 
     private function escape_css_string(string $value): string
     {
@@ -434,7 +456,7 @@ class Persian_Origins_Site_Settings
                     <?php endforeach; ?>
                 </div>
                 <div class="po-site-settings__section">
-                    <label class="po-site-settings__label" id="po-font-size-label"><?php esc_html_e('Text size', 'persian-origins'); ?></label>
+                    <span class="po-site-settings__label" id="po-font-size-label"><?php esc_html_e('Text size', 'persian-origins'); ?></span>
                     <div class="po-site-settings__font-size-controls" role="group" aria-labelledby="po-font-size-label">
                         <button type="button" class="po-site-settings__btn po-font-size--decrease" aria-label="<?php esc_attr_e('Decrease text size', 'persian-origins'); ?>">A−</button>
                         <output id="po-font-size-output" class="po-site-settings__font-size-output" aria-live="polite">100%</output>

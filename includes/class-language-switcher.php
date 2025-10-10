@@ -133,7 +133,7 @@ class Persian_Origins_Language_Switcher
         ];
         $args = wp_parse_args($args, $defaults);
 
-        $wrapper_class = $this->sanitize_class_attribute('po-language-switch ' . $args['wrapper_class']);
+        $wrapper_class = $this->sanitize_class_attribute('po-language-switch lang-switch-btn ' . $args['wrapper_class']);
         $link_class    = $this->sanitize_class_attribute('po-language-switch__link ' . $args['link_class']);
 
         $current_lang = $this->determine_context_language();
@@ -163,22 +163,57 @@ class Persian_Origins_Language_Switcher
             : __('English', 'persian-origins');
 
         $target_label = ($target_lang === 'fa')
-            ? __('Switch to Persian', 'persian-origins')
+            ? 'نمایش به زبان پارسی'
             : 'Switch to English';
 
-        // Markup
+        $plugin_url = plugins_url('', PERSIAN_ORIGINS_PLUGIN_FILE); // main plugin file const
+        $fa_flag    = $plugin_url . '/assets/img/fa-flag-w50.png';
+        $en_flag    = $plugin_url . '/assets/img/en-flag-w50.png';
+        // Decide flag order by current language (last img appears on top)
+        $flags_html = ($current_lang === 'fa')
+            ? sprintf(
+                '<img class="flag flag--en" src="%s" alt="%s" width="30" height="30" loading="lazy">
+         <img class="flag flag--fa" src="%s" alt="%s" width="30" height="30" loading="lazy">',
+                esc_url($en_flag),
+                esc_attr__('English', 'persian-origins'),
+                esc_url($fa_flag),
+                esc_attr__('فارسی', 'persian-origins')
+            )
+            : sprintf(
+                '<img class="flag flag--fa" src="%s" alt="%s" width="30" height="30" loading="lazy">
+         <img class="flag flag--en" src="%s" alt="%s" width="30" height="30" loading="lazy">',
+                esc_url($fa_flag),
+                esc_attr__('فارسی', 'persian-origins'),
+                esc_url($en_flag),
+                esc_attr__('English', 'persian-origins')
+            );
+
+        $state_class = ($current_lang === 'fa') ? 'is-fa' : 'is-en';
+
         $markup = sprintf(
-            '<div class="%1$s" data-current-lang="%2$s">
-            <span class="po-language-switch__current">%3$s</span>
-            <a class="%4$s" href="%5$s">%6$s</a>
-        </div>',
-            esc_attr($wrapper_class),
+            '<div class="po-switch-wrap %8$s" data-current-lang="%1$s" aria-label="%7$s">
+                <button class="po-switch-tab" type="button" aria-label="%9$s" tabindex="0">
+                    <span class="po-flagstack">%12$s</span>
+                </button>
+                <div class="%2$s" role="region">
+                    <span class="po-language-switch__current">%3$s</span>
+                    <a class="%4$s" href="%5$s">%6$s</a>
+                </div>
+            </div>',
             esc_attr($current_lang),
+            esc_attr($wrapper_class),  // "po-language-switch lang-switch-btn po-language-switch--floating"
             esc_html(sprintf(__('Current: %s', 'persian-origins'), $current_label)),
             esc_attr($link_class),
             esc_url($switch_url),
-            esc_html($target_label)
+            esc_html($target_label),
+            esc_attr__('Language switch', 'persian-origins'),
+            esc_attr($state_class),
+            esc_attr__('Open language switch', 'persian-origins'),
+            esc_url($fa_flag),
+            esc_url($en_flag),
+            $flags_html // <-- %12$s
         );
+
 
         return (string) apply_filters(
             'persian_origins_language_switch_markup',

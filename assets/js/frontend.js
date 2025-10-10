@@ -60,11 +60,13 @@
   function setLangCookie(lang) {
     if (!lang) return;
     var maxAge = 365 * 24 * 60 * 60; // 1 year
-    var cookie = "po_lang=" + encodeURIComponent(lang) + ";path=/;SameSite=Lax;max-age=" + maxAge;
-    if (window.location && window.location.protocol === "https:") {
-      cookie += ";secure";
-    }
-    document.cookie = cookie;
+    var base = ";path=/;SameSite=Lax;max-age=" + maxAge + (location.protocol === "https:" ? ";secure" : "");
+
+    // Old cookie you had:
+    document.cookie = "po_lang=" + encodeURIComponent(lang) + base;
+
+    // NEW: cookie the PHP actually reads:
+    document.cookie = "po_preferred_language=" + encodeURIComponent(lang) + base;
   }
 
   function getCookie(name) {

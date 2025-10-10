@@ -1,8 +1,7 @@
-/* ---------- Language Switch ---------- */
+/* ---------- Language Switch (final, left-anchored, RTL-safe) ---------- */
+
+/* Panel base styles */
 .po-language-switch {
-  position: fixed;
-  top: 10rem;
-  left: 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -12,29 +11,151 @@
   border-radius: 999px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
   font-size: 0.875rem;
-  z-index: 9999;
 }
 
+/* Fixed wrapper — ALWAYS stuck to the left, regardless of language */
+.po-switch-wrap {
+  position: fixed;
+  top: 10rem;
+  left: 0 !important; /* pin to left edge */
+  right: auto !important; /* neutralize any RTL flips */
+  z-index: 9999;
+  direction: ltr; /* prevent bidi reordering inside */
+  unicode-bidi: isolate;
+  min-height: 44px; /* reserve hit area for the tab */
+}
+
+/* Make the sliding panel absolute so it doesn't reserve layout space */
+.po-language-switch.lang-switch-btn.po-language-switch--floating {
+  width: 270px;
+  position: absolute; /* <— key change */
+  top: 45px;
+  left: -270px; /* hidden off-screen to the left */
+  transition: left 0.25s ease;
+}
+
+/* Reveal on hover OR keyboard focus within wrapper */
+.po-switch-wrap:hover .po-language-switch.lang-switch-btn.po-language-switch--floating,
+.po-switch-wrap:focus-within .po-language-switch.lang-switch-btn.po-language-switch--floating {
+  left: 0; /* slides in to align with viewport left */
+}
+
+/* The small “tab” you hover/focus to reveal */
+.po-switch-tab {
+  position: relative; /* sits above the sliding panel */
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: #222;
+  color: #fff;
+  border: 0;
+  border-radius: 0 999px 999px 0; /* anchored to LEFT */
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+.po-switch-tab:focus-visible {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.15);
+}
+
+/* --- Circular two-flag overlap --- */
+.po-flagpile {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  isolation: isolate;
+}
+
+/* Both flags are circles, overlapped with a small diagonal offset */
+.po-flagpile .flag {
+  position: absolute;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 2px solid #222; /* blends with tab edge */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transform: translate(6px, 6px);
+  transition: transform 0.18s ease, z-index 0.18s ease;
+  filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.7));
+}
+
+/* Top flag based on language state */
+.po-switch-wrap.is-fa .flag--fa {
+  z-index: 3 !important;
+  transform: translate(-6px, 0);
+  filter: drop-shadow(0 0 6px black);
+}
+.po-switch-wrap.is-fa .flag--en {
+  z-index: 2 !important;
+  transform: translate(6px, 6px);
+  filter: blur(0.5px);
+}
+
+.po-switch-wrap.is-en .flag--en {
+  z-index: 3 !important;
+  transform: translate(-6px, 0);
+  filter: drop-shadow(0 0 6px black);
+}
+.po-switch-wrap.is-en .flag--fa {
+  z-index: 2 !important;
+  transform: translate(6px, 6px);
+  filter: blur(0.5px);
+}
+
+/* Subtle lift of the top flag on hover/focus */
+.po-switch-wrap:hover .po-flagpile .flag[z-index="2"],
+.po-switch-wrap:focus-within .po-flagpile .flag[z-index="2"] {
+  transform: translate(0, 0) translateY(-1px);
+}
+
+/* Inner text/link styles */
 .po-language-switch__current {
-  color: #555555;
+  color: #555;
   font-weight: 500;
 }
-
 .po-language-switch__link {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 0.35rem 0.75rem;
   border-radius: 999px;
-  background: #222222;
-  color: #ffffff;
+  background: #222;
+  color: #fff;
   text-decoration: none;
   font-weight: 600;
   transition: background 0.2s ease, transform 0.2s ease;
 }
-
 .po-language-switch__link:hover,
 .po-language-switch__link:focus {
-  background: #444444;
+  background: #444;
   transform: translateY(-1px);
+}
+
+/* Neutralize any theme styles that might touch the button */
+div.po-switch-wrap > button {
+  border: none;
+  padding: 0;
+  box-shadow: none !important;
+  background: transparent;
+}
+div.po-switch-wrap > button:hover,
+div.po-switch-wrap > button:focus {
+  background: transparent;
+}
+
+/* -------- Optional: small-screen tweaks (keep left-pinned) -------- */
+@media (max-width: 600px) {
+  .po-switch-wrap {
+    top: 0.75rem;
+  }
+  .po-language-switch.lang-switch-btn.po-language-switch--floating {
+    top: 0;
+    left: -270px; /* stay left-pinned even on RTL */
+  }
 }

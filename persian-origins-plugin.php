@@ -125,13 +125,6 @@ final class Persian_Origins_Plugin
         );
 
         wp_enqueue_style(
-            'po-fonts-shabnam',
-            PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/fonts-shabnam.css',
-            ['po-base'],
-            self::VERSION
-        );
-
-        wp_enqueue_style(
             'po-language-switch',
             PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/components.language-switch.css',
             ['po-base'],
@@ -162,7 +155,7 @@ final class Persian_Origins_Plugin
         wp_enqueue_style(
             'po-fa-overrides',
             PERSIAN_ORIGINS_PLUGIN_URL . 'assets/css/fa.overrides.css',
-            ['po-base', 'po-fonts-shabnam'],
+            [],
             self::VERSION
         );
 
