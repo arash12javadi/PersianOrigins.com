@@ -41,3 +41,22 @@ body.po-lang-fa .po-progress-bar__meta,
 body.po-lang-fa .po-progress-bar__counts {
   justify-content: space-between !important;
 }
+
+/* ---------- category cards */
+a.po-cat-card__media {
+  display: flex;
+  justify-content: center;
+}
+img.attachment-medium.size-medium {
+  max-width: 225px;
+}
+
+a.po-cat-card__media {
+  background: #fff;
+  padding-bottom: 2rem;
+  padding-top: 2rem;
+}
+
+article.po-cat-card {
+  filter: drop-shadow(2px 4px 6px lightgrey);
+}

@@ -34,24 +34,3 @@ body.po-dir-rtl .po-site-settings {
   right: auto;
   left: 1.5rem;
 }
-
-/* ---------- Responsive tweaks ---------- */
-@media (max-width: 600px) {
-  .po-language-switch {
-    top: 0.75rem;
-    right: 0.75rem;
-  }
-  body.po-dir-rtl .po-language-switch {
-    right: auto;
-    left: 0.75rem;
-  }
-
-  .po-site-settings {
-    bottom: 1rem;
-    right: 1rem;
-  }
-  body.po-dir-rtl .po-site-settings {
-    right: auto;
-    left: 1rem;
-  }
-}

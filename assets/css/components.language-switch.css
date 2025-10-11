@@ -35,6 +35,12 @@
   min-height: 44px; /* reserve hit area for the tab */
 }
 
+@media (max-width: 992px) {
+  .po-switch-wrap.po-switch-wrap--footer {
+    top: 25% !important;
+  }
+}
+
 /* Make the sliding panel absolute so it doesn't reserve layout space */
 .po-language-switch.lang-switch-btn.po-language-switch--floating {
   width: 280px;
@@ -130,6 +136,7 @@
   font-weight: 500;
 }
 .po-language-switch__link {
+  font-family: "Yekan";
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -157,11 +164,4 @@ div.po-switch-wrap > button {
 div.po-switch-wrap > button:hover,
 div.po-switch-wrap > button:focus {
   background: transparent;
-}
-
-/* -------- Optional: small-screen tweaks (keep left-pinned) -------- */
-@media (max-width: 992px) {
-  .po-switch-wrap {
-    top: 0.75rem;
-  }
 }
