@@ -43,10 +43,10 @@
 
 /* Make the sliding panel absolute so it doesn't reserve layout space */
 .po-language-switch.lang-switch-btn.po-language-switch--floating {
-  width: 280px;
+  width: 285px;
   position: absolute; /* <— key change */
   top: 45px;
-  left: -280px; /* hidden off-screen to the left */
+  left: -285px; /* hidden off-screen to the left */
   transition: left 0.25s ease;
 }
 
@@ -136,7 +136,6 @@
   font-weight: 500;
 }
 .po-language-switch__link {
-  font-family: "Yekan";
   display: inline-flex;
   align-items: center;
   justify-content: center;

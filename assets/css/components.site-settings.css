@@ -1,70 +1,60 @@
-/* ---------- Site Settings ---------- */
-/* Base (works for inline shortcode instances) */
+/* ============ Site Settings (Inline + Floating) ============ */
+
+/* Wrapper (inline/shortcode by default) */
 .po-site-settings {
-  position: static; /* not fixed anymore */
-  display: flex;
+  position: relative;
+  display: inline-flex;
   flex-direction: column;
   gap: 0.75rem;
   width: fit-content;
 }
+
+/* Floating instance (footer) */
 .po-site-settings.po-site-settings--floating {
   position: fixed;
-  bottom: 1.5rem;
-  left: 0.2rem;
+  bottom: 1rem;
+  left: 1rem;
   z-index: 9998;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  /* keep the layout simple: single toggle + panel above it */
+  display: inline-flex;
+  align-items: flex-start;
 }
 
-@media (max-width: 992px) {
-  body > div.po-site-settings--floating {
-    bottom: 25% !important;
-  }
+/* Optional: Panel-only mode (your shortcode mode="panel") */
+.po-site-settings.po-site-settings--panel-only .po-site-settings__toggle {
+  display: none !important;
 }
 
-div.po-site-settings > button > span.po-site-settings__toggle-label {
-  display: none;
-}
-div.po-site-settings:hover > button > span.po-site-settings__toggle-label,
-div.po-site-settings:focus-within > button > span.po-site-settings__toggle-label,
-div.po-site-settings[data-open="true"] > button > span.po-site-settings__toggle-label {
-  display: inline-block;
-}
-
+/* ---------- Toggle Button ---------- */
 .po-site-settings__toggle {
-  display: flex !important;
-  justify-content: space-evenly;
+  display: inline-flex !important;
+  justify-content: center;
   align-items: center;
-  border-radius: 999px;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
   border: 1px solid #dedede;
+  border-radius: 999px !important;
   background: #ffffff;
   color: #1f2937;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.875rem;
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
   text-align: center !important;
-  padding: 10px !important;
-  border-radius: 100% !important;
-  width: 40px !important;
-  height: 40px !important;
   position: relative;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, border-color 0.18s ease;
 }
 
+/* Hover/focus feedback (no size changes, no layout shift) */
 .po-site-settings__toggle:hover,
 .po-site-settings__toggle:focus {
   transform: translateY(-2px);
   box-shadow: 0 16px 30px rgba(15, 23, 42, 0.18);
-  padding: auto !important;
-  border-radius: 5px !important;
-  width: auto !important;
-  height: auto !important;
+  border-color: #cfd2d5;
 }
 
-/* soft focus ring glow (no layout shift) */
+/* Soft focus ring (no layout shift) */
 .po-site-settings__toggle:focus-visible::after {
   content: "";
   position: absolute;
@@ -74,38 +64,36 @@ div.po-site-settings[data-open="true"] > button > span.po-site-settings__toggle-
   pointer-events: none;
 }
 
-/* press feedback */
+/* Press feedback */
 .po-site-settings__toggle.is-pressing {
   transform: scale(0.96);
 }
 
-/* gear icon container */
+/* Gear icon container */
 .po-site-settings__toggle-icon {
   display: inline-flex;
   width: 1em;
   height: 1em;
+  font-size: 1rem;
   align-items: center;
   justify-content: center;
 }
 
-/* gear spin animation */
+/* Gear spin animation */
 @keyframes po-gear-spin {
   to {
     transform: rotate(360deg);
   }
 }
-
-/* spin gently on hover; faster when open */
 .po-site-settings__toggle:hover .po-site-settings__toggle-icon {
   animation: po-gear-spin 1.2s linear infinite;
 }
-
-/* when panel open (aria-expanded=true), spin a bit faster */
+.po-site-settings.is-open .po-site-settings__toggle .po-site-settings__toggle-icon,
 .po-site-settings__toggle[aria-expanded="true"] .po-site-settings__toggle-icon {
   animation: po-gear-spin 0.8s linear infinite;
 }
 
-/* respect reduced motion */
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .po-site-settings__toggle,
   .po-site-settings__toggle:hover,
@@ -118,28 +106,74 @@ div.po-site-settings[data-open="true"] > button > span.po-site-settings__toggle-
   }
 }
 
-.po-site-settings__toggle-icon {
-  font-size: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+/* ---------- Toggle Label Bubble (no layout shift) ---------- */
+.po-site-settings__toggle-label {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%) translateX(4px);
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  background: #ffffff;
+  color: #1f2937;
+  border: 1px solid #dedede;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.15);
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
+.po-site-settings:hover .po-site-settings__toggle-label,
+.po-site-settings:focus-within .po-site-settings__toggle-label,
+.po-site-settings.is-open .po-site-settings__toggle-label,
+.po-site-settings[data-open="true"] .po-site-settings__toggle-label {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+/* ---------- Panel ---------- */
 .po-site-settings__panel {
-  min-width: 240px;
+  min-width: 260px;
   padding: 1rem;
   border-radius: 1rem;
   border: 1px solid #dedede;
-  background: rgba(255, 255, 255, 0.97);
+  background: rgba(255, 255, 255, 0.98);
   box-shadow: 0 22px 45px rgba(15, 23, 42, 0.2);
 }
+
+/* Hidden attribute honored by your JS */
 .po-site-settings__panel[hidden] {
   display: none;
 }
 
+/* Inline panel spacing */
+.po-site-settings:not(.po-site-settings--floating) .po-site-settings__panel {
+  margin-top: 0.25rem;
+}
+
+/* Floating panel pops above the button */
+.po-site-settings.po-site-settings--floating .po-site-settings__panel {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  transform-origin: bottom left;
+}
+
+/* Small screens: raise the floating button a bit */
+@media (max-width: 992px) {
+  .po-site-settings.po-site-settings--floating {
+    bottom: 20%;
+    left: 0.75rem;
+  }
+}
+
+/* ---------- Panel Sections + Inputs ---------- */
 .po-site-settings__section + .po-site-settings__section {
   margin-top: 1rem;
 }
+
 .po-site-settings__label {
   display: block;
   font-size: 0.75rem;
@@ -148,11 +182,16 @@ div.po-site-settings[data-open="true"] > button > span.po-site-settings__toggle-
   margin-bottom: 0.4rem;
   color: #475569;
 }
+
 .po-site-settings__sub-label {
   display: block;
   font-size: 0.75rem;
   margin-bottom: 0.35rem;
   color: #64748b;
+}
+
+.po-site-settings__group[hidden] {
+  display: none !important;
 }
 
 .po-site-settings__select {
@@ -169,17 +208,6 @@ div.po-site-settings[data-open="true"] > button > span.po-site-settings__toggle-
   outline: none;
   border-color: #4f46e5;
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-}
-.po-site-settings__group[hidden] {
-  display: none;
-}
-
-/* ---------- Dark Theme Bits ---------- */
-body.po-theme-dark .po-progress-bar__meta {
-  color: #f8fafc;
-}
-body.po-theme-dark .po-progress-bar__counts {
-  color: #cbd5f5;
 }
 
 /* ---------- Root text scale + controls ---------- */
@@ -210,4 +238,37 @@ html {
 .po-site-settings__font-size-output {
   min-width: 3.5ch;
   text-align: center;
+}
+
+/* ---------- Dark Theme Tweaks ---------- */
+body.po-theme-dark .po-site-settings__toggle {
+  background: #0f172a;
+  color: #e5e7eb;
+  border-color: #334155;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+}
+body.po-theme-dark .po-site-settings__toggle:hover,
+body.po-theme-dark .po-site-settings__toggle:focus {
+  border-color: #475569;
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.45);
+}
+body.po-theme-dark .po-site-settings__toggle-label {
+  background: #0f172a;
+  color: #e5e7eb;
+  border-color: #334155;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+body.po-theme-dark .po-site-settings__panel {
+  background: rgba(15, 23, 42, 0.98);
+  border-color: #334155;
+  box-shadow: 0 22px 45px rgba(0, 0, 0, 0.5);
+}
+body.po-theme-dark .po-site-settings__label,
+body.po-theme-dark .po-site-settings__sub-label {
+  color: #cbd5e1;
+}
+body.po-theme-dark .po-site-settings__select {
+  background: #0b1222;
+  color: #e5e7eb;
+  border-color: #334155;
 }

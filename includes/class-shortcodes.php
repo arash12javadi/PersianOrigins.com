@@ -30,18 +30,33 @@ class Persian_Origins_Shortcodes
     {
         $atts = shortcode_atts(
             [
-                'class'      => '',
-                'link_class' => '',
+                'mode'        => 'inline', // inline | floating
+                'class'       => '',
+                'link_class'  => '',
+                'outer_class' => '',       // lets you add a marker on the outer wrapper
             ],
             $atts,
             'language_switch'
         );
 
+        // Map mode -> wrapper class (inner container)
+        $variant_class = ($atts['mode'] === 'floating')
+            ? 'po-language-switch--floating'
+            : 'po-language-switch--inline';
+
         return $this->language_switcher->get_switch_markup([
-            'wrapper_class' => $this->sanitize_class_attribute($atts['class']),
+            'wrapper_class' => $this->sanitize_class_attribute(trim($variant_class . ' ' . $atts['class'])),
             'link_class'    => $this->sanitize_class_attribute($atts['link_class']),
+            'outer_class'   => $this->sanitize_class_attribute(
+                $atts['outer_class'] ?: (
+                    $atts['mode'] === 'floating'
+                    ? 'po-switch-wrap--shortcode' // distinguish shortcode floaters
+                    : 'po-switch-wrap--inline'
+                )
+            ),
         ]);
     }
+
 
     public function render_continue_reading($atts = []): string
     {

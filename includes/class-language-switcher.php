@@ -235,7 +235,7 @@ class Persian_Origins_Language_Switcher
             </button>
             <div class="%3$s" role="region">
                 <span class="po-language-switch__current">%4$s</span>
-                <a class="%5$s" href="%6$s">%7$s</a>
+                <a class="%5$s" style="font-family:Yekan !important;" href="%6$s">%7$s</a>
             </div>
         </div>',
             esc_attr($outer_class),                                                 // %1$s  (outer wrapper classes)

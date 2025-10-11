@@ -10,24 +10,26 @@ The plugin registers three shortcodes for bilingual content management.
 
 ---
 
-## [language_switch]
+### [language_switch]
 
 Renders the language switcher UI with flag icons and toggle functionality.
 
-### Syntax
+#### Syntax
 
 ```
-[language_switch]
+[language_switch mode="inline" class="" link_class="" outer_class=""]
 ```
 
-### Attributes
+#### Attributes
 
-| Attribute    | Type   | Description                               |
-| ------------ | ------ | ----------------------------------------- |
-| `class`      | string | Extra CSS classes for the wrapper element |
-| `link_class` | string | Extra CSS classes for the switch link     |
+| Attribute     | Type   | Default  | Description                                                 |
+| ------------- | ------ | -------- | ----------------------------------------------------------- |
+| `mode`        | string | `inline` | Display mode: `inline` or `floating`                        |
+| `class`       | string | `''`     | Additional CSS classes for the inner wrapper                |
+| `link_class`  | string | `''`     | CSS classes for the language link elements                  |
+| `outer_class` | string | Auto     | CSS classes for the outer wrapper (auto-generated if empty) |
 
-### Examples
+#### Examples
 
 **Basic usage:**
 
@@ -35,45 +37,58 @@ Renders the language switcher UI with flag icons and toggle functionality.
 [language_switch]
 ```
 
+**Floating mode:**
+
+```
+[language_switch mode="floating"]
+```
+
 **With custom classes:**
 
 ```
-[language_switch class="my-switch my-switch--inline" link_class="btn btn-primary"]
+[language_switch class="my-custom-class" link_class="custom-link"]
 ```
 
-### Notes
+**With outer wrapper class:**
+
+```
+[language_switch outer_class="my-wrapper-class"]
+```
+
+#### Notes
 
 - Respects current language context
 - Swaps flag images in DOM order for consistent stacking
 - Links to opposite language page or safe fallback
 - Works in pages, posts, and shortcode-enabled widgets
 - Styled by plugin's global CSS
+- Auto-assigns wrapper classes based on mode if `outer_class` is empty
 
 ---
 
-## [continue_reading]
+### [continue_reading]
 
 Displays a "Continue Reading" button that directs users to the next unread post in a category.
 
-### Syntax
+#### Syntax
 
 ```
-[continue_reading category="category-slug"]
+[continue_reading category="" class=""]
 ```
 
-### Attributes
+#### Attributes
 
-| Attribute  | Type       | Required | Description                          |
-| ---------- | ---------- | -------- | ------------------------------------ |
-| `category` | string/int | **Yes**  | Category slug or ID                  |
-| `class`    | string     | No       | Extra CSS classes for button wrapper |
+| Attribute  | Type       | Default  | Description                           |
+| ---------- | ---------- | -------- | ------------------------------------- |
+| `category` | string/int | Required | Category slug or ID                   |
+| `class`    | string     | `''`     | Additional CSS classes for the button |
 
-### Examples
+#### Examples
 
 **With category slug:**
 
 ```
-[continue_reading category="history"]
+[continue_reading category="tutorials"]
 ```
 
 **With category ID:**
@@ -85,45 +100,48 @@ Displays a "Continue Reading" button that directs users to the next unread post 
 **With custom styling:**
 
 ```
-[continue_reading category="history" class="btn btn-accent w-full"]
+[continue_reading category="guides" class="btn-primary btn-lg"]
 ```
 
-### Behavior
+#### Behavior
 
 - Tracks read posts via localStorage with cookie fallback
-- Returns empty string if category is invalid
+- Returns empty string if category parameter is missing or invalid
+- Accepts both category slug and numeric ID
 - Calculates next unread post within specified category
 - Reading progress is per-browser (not server-side)
 - May point to first post if all posts are read
 
 ---
 
-## [po_categories]
+### [po_categories]
 
 Renders a responsive grid of categories with bilingual titles, descriptions, and optional images.
 
-### Syntax
+#### Syntax
 
 ```
-[po_categories]
+[po_categories taxonomy="category" include="" exclude="" hide_empty="false"
+               number="" orderby="name" order="ASC" columns="3"
+               image_size="medium" parent=""]
 ```
 
-### Attributes
+#### Attributes
 
-| Attribute    | Type    | Default    | Description                         |
-| ------------ | ------- | ---------- | ----------------------------------- |
-| `taxonomy`   | string  | `category` | WordPress taxonomy slug             |
-| `include`    | string  | —          | Comma-separated term IDs to include |
-| `exclude`    | string  | —          | Comma-separated term IDs to exclude |
-| `hide_empty` | boolean | `false`    | Hide terms with no posts            |
-| `number`     | int     | —          | Limit number of terms displayed     |
-| `orderby`    | string  | `name`     | Sort field (name, count, etc.)      |
-| `order`      | string  | `ASC`      | Sort direction (ASC or DESC)        |
-| `columns`    | int     | `3`        | Grid columns (1-6)                  |
-| `image_size` | string  | `medium`   | WordPress image size                |
-| `parent`     | int     | —          | Filter by parent ID (0 = top-level) |
+| Attribute    | Type   | Default    | Description                                 |
+| ------------ | ------ | ---------- | ------------------------------------------- |
+| `taxonomy`   | string | `category` | Taxonomy to query                           |
+| `include`    | string | `''`       | Comma-separated term IDs to include         |
+| `exclude`    | string | `''`       | Comma-separated term IDs to exclude         |
+| `hide_empty` | string | `false`    | Whether to hide categories with no posts    |
+| `number`     | int    | `''`       | Maximum number of categories to display     |
+| `orderby`    | string | `name`     | Sort field (name, count, slug, etc.)        |
+| `order`      | string | `ASC`      | Sort order: `ASC` or `DESC`                 |
+| `columns`    | int    | `3`        | Number of grid columns (1-6)                |
+| `image_size` | string | `medium`   | WordPress image size slug                   |
+| `parent`     | int    | `''`       | Parent term ID (use `0` for top-level only) |
 
-### Examples
+#### Examples
 
 **Default 3-column grid:**
 
@@ -134,57 +152,239 @@ Renders a responsive grid of categories with bilingual titles, descriptions, and
 **4 columns with 12 items:**
 
 ```
-[po_categories columns="4" hide_empty="true" number="12"]
+[po_categories columns="4" number="12"]
 ```
 
-**Specific tags with thumbnails:**
+**Specific categories with thumbnails:**
 
 ```
-[po_categories taxonomy="post_tag" include="3,7,12" columns="6" image_size="thumbnail"]
+[po_categories include="5,12,18" image_size="thumbnail"]
 ```
 
 **Top-level categories by post count:**
 
 ```
-[po_categories parent="0" order="DESC" orderby="count"]
+[po_categories parent="0" orderby="count" order="DESC"]
 ```
 
 **Include specific categories:**
 
 ```
-[po_categories include="5,8,12,15" columns="4"]
+[po_categories include="3,7,15,22"]
 ```
 
 **Exclude specific categories:**
 
 ```
-[po_categories exclude="1,2,3" hide_empty="true"]
+[po_categories exclude="1,9"]
 ```
 
-### Output Structure
+**Custom taxonomy:**
 
-```html
-<div class="po-cat-grid cols-4">
-  <article class="po-cat-card">
-    <a class="po-cat-card__media" href="/category/history/">
-      <img src="..." alt="..." />
-    </a>
-    <div class="po-cat-card__body">
-      <h3 class="po-cat-title">
-        <a href="/category/history/">
-          <span class="po-text--en">History</span>
-          <span class="po-text--fa">تاریخ</span>
-        </a>
-      </h3>
-      <div class="po-cat-desc">
-        <div class="po-text--en"><p>English description…</p></div>
-        <div class="po-text--fa"><p>توضیح فارسی…</p></div>
-      </div>
-    </div>
-  </article>
-  <!-- Additional cards -->
-</div>
 ```
+[po_categories taxonomy="custom_tax" columns="2"]
+```
+
+#### Output Structure
+
+Each category card displays:
+
+- **Optional featured image** (if set via category meta)
+- **Bilingual title** (English from core, Persian from meta with fallback)
+- **Bilingual description** (English from core, Persian from meta with fallback)
+- **Automatic language toggling** via body classes (`po-lang-en` / `po-lang-fa`)
+
+#### Bilingual Behavior
+
+- English content uses standard WordPress category fields
+- Persian content uses custom meta fields:
+  - `po_cat_name_fa` for Persian title
+  - `po_cat_desc_fa` for Persian description
+  - `po_cat_img_id` for featured image
+- Falls back to English if Persian content is missing
+- Language visibility controlled by body class CSS
+
+#### Styling
+
+The shortcode includes minimal built-in CSS for:
+
+- Responsive grid layout (1-6 columns)
+- Card structure and spacing
+- Language-specific content visibility
+- Customize appearance using CSS variables:
+  - `--po-card-bg` (default: `#f7f7f7`)
+  - `--po-border` (default: `#e5e5e5`)
+  - `--po-muted` (default: `#555`)
+
+#### Notes
+
+- Returns empty string if no categories found
+- Images are lazy-loaded for performance
+- All category names and descriptions are properly escaped
+- Links point to category archive pages
+- Respects WordPress taxonomy hierarchy
+
+---
+
+### [site_settings]
+
+Renders a site settings panel with controls for theme, fonts, and text size preferences.
+
+#### Syntax
+
+```
+[site_settings class="" mode="full"]
+```
+
+#### Attributes
+
+| Attribute | Type   | Default | Description                                                           |
+| --------- | ------ | ------- | --------------------------------------------------------------------- |
+| `class`   | string | `''`    | Additional CSS classes for the wrapper                                |
+| `mode`    | string | `full`  | Display mode: `full` (with toggle button) or `panel` (always visible) |
+
+#### Examples
+
+**Basic usage (with toggle button):**
+
+```
+[site_settings]
+```
+
+**Always visible panel:**
+
+```
+[site_settings mode="panel"]
+```
+
+**With custom class:**
+
+```
+[site_settings class="my-custom-settings"]
+```
+
+**Panel-only mode with class:**
+
+```
+[site_settings mode="panel" class="sidebar-settings"]
+```
+
+#### Features
+
+The site settings panel includes three control sections:
+
+##### 1. Theme Selector
+
+- Toggle between light and dark themes
+- Preference saved in cookies (`po_site_theme`)
+- Applies `.po-theme-light` or `.po-theme-dark` body class
+
+##### 2. Font Selector
+
+- Separate font controls for English and Persian
+- Shows/hides based on current language context
+- Options include:
+  - System default
+  - Custom fonts loaded from plugin's `assets/fonts/` directory
+- Supports multiple font weights and styles (regular, bold, italic)
+- Preferences saved in cookies (`po_font_en`, `po_font_fa`)
+- Applies language-specific font classes to body
+
+##### 3. Text Size Controls
+
+- Increase text size (A+)
+- Decrease text size (A−)
+- Reset to default (Reset button)
+- Live output display showing current percentage
+- Accessible controls with ARIA labels
+
+#### Display Modes
+
+**Full Mode (default):**
+
+- Includes a toggle button with gear icon (⚙)
+- Panel is initially hidden
+- Click button to show/hide settings
+- Ideal for header/sidebar integration
+
+**Panel Mode:**
+
+- No toggle button
+- Panel is always visible
+- Useful for dedicated settings pages
+- Suitable for embedding in page content
+
+#### Technical Details
+
+**Font System:**
+
+- Automatically loads fonts from `/assets/fonts/en/` and `/assets/fonts/fa/`
+- Supports WOFF and WOFF2 formats
+- Generates `@font-face` declarations dynamically
+- Font weights detected from filenames (thin, light, regular, medium, bold, etc.)
+- Font styles detected from filenames (italic detection)
+
+**Cookie Storage:**
+
+- Theme: `po_site_theme` (values: `light`, `dark`)
+- English font: `po_font_en` (value: font slug or `system`)
+- Persian font: `po_font_fa` (value: font slug or `system`)
+- Cookie expiration: 1 year
+
+**Body Classes Applied:**
+
+- Theme: `.po-theme-light` or `.po-theme-dark`
+- Language: `.po-lang-en` or `.po-lang-fa`
+- Direction: `.po-dir-ltr` or `.po-dir-rtl`
+- Font: `.po-font-{language}-{slug}` (e.g., `.po-font-en-open-sans`)
+
+**Accessibility:**
+
+- Proper ARIA labels and attributes
+- Keyboard accessible controls
+- Live regions for dynamic updates
+- Semantic HTML structure
+
+#### Integration Notes
+
+- A floating version is automatically rendered in `wp_footer` (priority 20)
+- Shortcode version adds `.po-site-settings--shortcode` class
+- Panel-only mode adds `.po-site-settings--panel-only` class
+- Each instance has a unique ID to prevent conflicts
+- Works seamlessly with the language switcher
+- Font changes apply immediately via body classes
+- Theme changes trigger instant visual updates
+
+#### Styling
+
+The component uses CSS variables for easy customization:
+
+- Custom styling can target `.po-site-settings` wrapper
+- Panel styles use `.po-site-settings__panel`
+- Button styles use `.po-site-settings__btn`
+- Select dropdowns use `.po-site-settings__select`
+
+#### Example Use Cases
+
+**In a sidebar widget:**
+
+```
+[site_settings mode="panel" class="widget-settings"]
+```
+
+**In page content with toggle:**
+
+```
+[site_settings class="content-settings"]
+```
+
+**Dedicated settings page:**
+
+```
+[site_settings mode="panel"]
+```
+
+---
 
 ### Bilingual Content
 

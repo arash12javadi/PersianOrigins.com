@@ -52,28 +52,23 @@ class Persian_Origins_Site_Settings
     {
         $atts = shortcode_atts(
             [
-                'class'    => '',           // extra classes
-                'floating' => 'inline',     // inline | floating
+                'class' => '',
+                // full | panel (panel = no button, panel always visible)
+                'mode'  => 'full',
             ],
             $atts,
             'site_settings'
         );
 
-        $want_floating = ($atts['floating'] === 'floating');
+        $panel_only = in_array(strtolower($atts['mode']), ['panel', 'panel-only', 'open'], true);
 
-        // If floating already rendered (footer or another shortcode), downgrade to inline
-        if ($want_floating && self::$floating_rendered) {
-            $want_floating = false;
-        }
+        $extra = trim(
+            $atts['class']
+                . ' po-site-settings--shortcode'
+                . ($panel_only ? ' po-site-settings--panel-only' : '')
+        );
 
-        if ($want_floating) {
-            self::$floating_rendered = true;
-        }
-
-        $variant_class = $want_floating ? 'po-site-settings--floating' : 'po-site-settings--inline';
-        $extra = trim($atts['class'] . ' ' . $variant_class);
-
-        return $this->get_panel_markup($extra, $want_floating);
+        return $this->get_panel_markup($extra, $panel_only);
     }
 
 
@@ -443,7 +438,7 @@ class Persian_Origins_Site_Settings
      * Return the settings panel markup (used by both footer + shortcode).
      * $extra_wrapper_classes lets shortcode add extra classes.
      */
-    public function get_panel_markup(string $extra_wrapper_classes = '', bool $floating = false): string
+    public function get_panel_markup(string $extra_wrapper_classes = '', bool $panel_only = false): string
     {
         $current_language = $this->get_current_language();
         $current_theme    = $this->get_theme_preference();
@@ -453,26 +448,27 @@ class Persian_Origins_Site_Settings
         ];
         $font_options     = $this->build_font_options();
 
-        // Ensure unique IDs per instance
         $uid = wp_unique_id('po-ss-');
 
         ob_start();
 ?>
         <div class="po-site-settings <?php echo esc_attr($extra_wrapper_classes); ?>"
             data-current-language="<?php echo esc_attr($current_language); ?>"
-            data-instance="<?php echo esc_attr($uid); ?>"
-            data-floating="<?php echo $floating ? '1' : '0'; ?>">
-            <button type="button"
-                class="po-site-settings__toggle"
-                aria-expanded="false"
-                aria-controls="<?php echo esc_attr($uid); ?>-panel">
-                <span class="po-site-settings__toggle-icon" aria-hidden="true">&#9881;</span>
-                <span class="po-site-settings__toggle-label"><?php esc_html_e('Site settings', 'persian-origins'); ?></span>
-            </button>
+            data-instance="<?php echo esc_attr($uid); ?>">
+
+            <?php if (! $panel_only) : ?>
+                <button type="button"
+                    class="po-site-settings__toggle"
+                    aria-expanded="false"
+                    aria-controls="<?php echo esc_attr($uid); ?>-panel">
+                    <span class="po-site-settings__toggle-icon" aria-hidden="true">&#9881;</span>
+                    <span class="po-site-settings__toggle-label"><?php esc_html_e('Site settings', 'persian-origins'); ?></span>
+                </button>
+            <?php endif; ?>
 
             <div class="po-site-settings__panel"
                 id="<?php echo esc_attr($uid); ?>-panel"
-                hidden>
+                <?php echo $panel_only ? '' : 'hidden'; ?>>
                 <div class="po-site-settings__section">
                     <label for="<?php echo esc_attr($uid); ?>-theme" class="po-site-settings__label">
                         <?php esc_html_e('Theme', 'persian-origins'); ?>
@@ -549,12 +545,7 @@ class Persian_Origins_Site_Settings
 
     public function render_panel(): void
     {
-        // Only render ONE floating widget from footer per page.
-        if (self::$floating_rendered) {
-            return;
-        }
-
-        echo $this->get_panel_markup('po-site-settings--floating', true); // flag floating
-        self::$floating_rendered = true;
+        // This one appears in the footer and should float
+        echo $this->get_panel_markup('po-site-settings--floating');
     }
 }
