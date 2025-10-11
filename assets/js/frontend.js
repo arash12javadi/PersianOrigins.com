@@ -15,9 +15,11 @@
 
   // The only element that should change theme:
   var themableArticles = document.querySelectorAll("#post-section > div > div > article");
-
+  if (!themableArticles.length) {
+    themableArticles = document.querySelectorAll("article");
+  }
   // ---- THEME HELPERS ----
-  var THEME_KEY = "po_theme"; // localStorage + cookie key
+  var THEME_KEY = "po_site_theme"; // localStorage + cookie key
 
   function getSystemTheme() {
     try {
@@ -62,10 +64,7 @@
     var maxAge = 365 * 24 * 60 * 60; // 1 year
     var base = ";path=/;SameSite=Lax;max-age=" + maxAge + (location.protocol === "https:" ? ";secure" : "");
 
-    // Old cookie you had:
-    document.cookie = "po_lang=" + encodeURIComponent(lang) + base;
-
-    // NEW: cookie the PHP actually reads:
+    // Cookie the PHP actually reads:
     document.cookie = "po_preferred_language=" + encodeURIComponent(lang) + base;
   }
 
@@ -212,123 +211,191 @@
   function initSiteSettings() {
     if (!settings || !body) return;
 
-    var container = document.querySelector(".po-site-settings");
-    if (!container) return;
+    // Find ALL site-settings instances
+    var containers = document.querySelectorAll(".po-site-settings");
+    if (!containers.length) return;
 
+    // Decide initial theme first (global)
     var currentLanguage = settings.currentLanguage || "en";
-    container.setAttribute("data-current-language", currentLanguage);
-
-    // Decide initial theme by priority:
-    // localStorage/cookie -> settings.theme -> system -> light
     var initialTheme = getSavedTheme() || settings.theme || getSystemTheme() || "light";
     applyTheme(initialTheme, false);
 
-    var languages = ["en", "fa"];
-    languages.forEach(function (lang) {
+    // Apply initial fonts (global per language)
+    ["en", "fa"].forEach(function (lang) {
       var fontSlug = settings.currentFonts && settings.currentFonts[lang] ? settings.currentFonts[lang] : "system";
       applyFont(lang, fontSlug, false);
     });
 
-    var toggle = container.querySelector(".po-site-settings__toggle");
-    var panel = container.querySelector(".po-site-settings__panel");
+    // Init EACH panel independently
+    containers.forEach(function (container) {
+      container.setAttribute("data-current-language", currentLanguage);
 
-    if (toggle && panel) {
-      // open/close on click
-      toggle.addEventListener("click", function (e) {
-        e.stopPropagation();
-        var isHidden = panel.hasAttribute("hidden");
-        if (isHidden) {
-          panel.removeAttribute("hidden");
-          toggle.setAttribute("aria-expanded", "true");
-        } else {
-          panel.setAttribute("hidden", "hidden");
-          toggle.setAttribute("aria-expanded", "false");
-        }
-      });
+      var toggle = container.querySelector(".po-site-settings__toggle");
+      var panel = container.querySelector(".po-site-settings__panel");
 
-      // close on outside click
-      document.addEventListener("click", function (e) {
-        if (!container.contains(e.target)) {
-          if (!panel.hasAttribute("hidden")) {
+      if (toggle) {
+        toggle.addEventListener("mousedown", function () {
+          toggle.classList.add("is-pressing");
+        });
+        ["mouseup", "mouseleave", "blur"].forEach(function (ev) {
+          toggle.addEventListener(ev, function () {
+            toggle.classList.remove("is-pressing");
+          });
+        });
+      }
+
+      if (toggle && panel) {
+        // Toggle open/close
+        toggle.addEventListener("click", function (e) {
+          var isHidden = panel.hasAttribute("hidden");
+          if (isHidden) {
+            panel.removeAttribute("hidden");
+            toggle.setAttribute("aria-expanded", "true");
+            container.classList.add("is-open");
+          } else {
             panel.setAttribute("hidden", "hidden");
             toggle.setAttribute("aria-expanded", "false");
+            container.classList.remove("is-open");
           }
-        }
-      });
+        });
 
-      // close on Escape
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape" && !panel.hasAttribute("hidden")) {
-          panel.setAttribute("hidden", "hidden");
-          toggle.setAttribute("aria-expanded", "false");
-          toggle.focus();
-        }
-      });
+        // ESC to close (per container)
+        container.addEventListener("keydown", function (e) {
+          if (e.key === "Escape" && container.classList.contains("is-open")) {
+            panel.setAttribute("hidden", "hidden");
+            toggle.setAttribute("aria-expanded", "false");
+            container.classList.remove("is-open");
+            toggle.focus();
+          }
+        });
+      }
 
-      // press animation state
-      toggle.addEventListener("mousedown", function () {
-        toggle.classList.add("is-pressing");
-      });
-      ["mouseup", "mouseleave", "blur"].forEach(function (ev) {
-        toggle.addEventListener(ev, function () {
-          toggle.classList.remove("is-pressing");
+      // Theme select (scoped to this container's selects)
+      var themeSelect = container.querySelector('[id$="-theme"]') || container.querySelector("#po-site-settings-theme");
+      if (!themeSelect && panel) {
+        themeSelect = container.querySelector("#" + panel.id.replace("-panel", "-theme"));
+      }
+      if (themeSelect) {
+        themeSelect.value = initialTheme;
+        themeSelect.addEventListener("change", function () {
+          var val = this.value === "dark" ? "dark" : "light";
+          applyTheme(val, true);
+        });
+      }
+
+      // Font selects (scoped)
+      var fontGroups = container.querySelectorAll(".po-site-settings__group");
+      var fontSelects = container.querySelectorAll(".po-site-settings__select--font");
+
+      // Set current values
+      fontSelects.forEach(function (select) {
+        var lang = select.getAttribute("data-language") || "en";
+        var cur = settings.currentFonts && settings.currentFonts[lang] ? settings.currentFonts[lang] : "system";
+        select.value = cur;
+        select.addEventListener("change", function () {
+          applyFont(lang, this.value, true);
         });
       });
-    }
 
-    // THEME SELECT: wire up change + set current value
-    var themeSelect = container.querySelector("#po-site-settings-theme");
-    if (themeSelect) {
-      themeSelect.value = initialTheme;
-      themeSelect.addEventListener("change", function () {
-        var val = this.value === "dark" ? "dark" : "light";
-        applyTheme(val, true);
-      });
-    }
+      function syncFontVisibility(language) {
+        fontGroups.forEach(function (group) {
+          if (group.getAttribute("data-language") === language) {
+            group.removeAttribute("hidden");
+          } else {
+            group.setAttribute("hidden", "hidden");
+          }
+        });
+      }
 
-    var fontGroups = container.querySelectorAll(".po-site-settings__group");
-    var fontSelects = container.querySelectorAll(".po-site-settings__select--font");
+      // Font-size controls scoped to THIS container
+      (function initFontSizeControlsIn(container) {
+        var out = container.querySelector(".po-site-settings__font-size-output");
+        var dec = container.querySelector(".po-font-size--decrease");
+        var inc = container.querySelector(".po-font-size--increase");
+        var reset = container.querySelector(".po-font-size--reset");
+        if (!out || !dec || !inc || !reset) return;
 
-    fontSelects.forEach(function (select) {
-      var lang = select.getAttribute("data-language") || "en";
-      var current = settings.currentFonts && settings.currentFonts[lang] ? settings.currentFonts[lang] : "system";
-      select.value = current;
-      select.addEventListener("change", function () {
-        applyFont(lang, this.value, true);
-      });
+        var MIN = 85,
+          MAX = 150,
+          STEP = 5,
+          KEY = "po_font_size_percent";
+
+        function clamp(v) {
+          return Math.max(MIN, Math.min(MAX, v));
+        }
+        function getSaved() {
+          var raw = localStorage.getItem(KEY);
+          var n = raw ? parseInt(raw, 10) : NaN;
+          return Number.isFinite(n) ? clamp(n) : 100;
+        }
+        function apply(val, persist) {
+          document.documentElement.style.setProperty("--po-font-size", val + "%");
+          out.textContent = val + "%";
+          if (persist !== false) localStorage.setItem(KEY, String(val));
+        }
+
+        // initial
+        apply(getSaved(), false);
+
+        dec.addEventListener("click", function () {
+          apply(clamp(getSaved() - STEP));
+        });
+        inc.addEventListener("click", function () {
+          apply(clamp(getSaved() + STEP));
+        });
+        reset.addEventListener("click", function () {
+          apply(100);
+        });
+
+        // Optional: shortcuts while this container is focused/open
+        container.addEventListener("keydown", function (e) {
+          if (!(e.ctrlKey || e.metaKey)) return;
+          if (e.key === "=") apply(clamp(getSaved() + STEP));
+          if (e.key === "-") apply(clamp(getSaved() - STEP));
+          if (e.key.toLowerCase() === "0") apply(100);
+        });
+      })(container);
+
+      syncFontVisibility(currentLanguage);
     });
 
-    function syncFontVisibility(language) {
-      fontGroups.forEach(function (group) {
-        if (group.getAttribute("data-language") === language) {
-          group.removeAttribute("hidden");
-        } else {
-          group.setAttribute("hidden", "hidden");
-        }
-      });
-    }
-
-    syncFontVisibility(currentLanguage);
-
-    // Listen for custom language switch events (if you already have them)
+    // Keep your existing language change listener (applies globally)
     document.addEventListener("poLangChange", function (e) {
       var lang = e.detail && e.detail.lang ? e.detail.lang : "en";
       setLangCookie(lang);
 
-      // reflect current language on the settings panel (if present)
-      var container = document.querySelector(".po-site-settings");
-      if (container) container.setAttribute("data-current-language", lang);
+      // Update all panels’ language state + visible group
+      document.querySelectorAll(".po-site-settings").forEach(function (container) {
+        container.setAttribute("data-current-language", lang);
 
-      // re-show the correct font dropdown group
-      if (typeof syncFontVisibility === "function") {
-        syncFontVisibility(lang);
-      }
+        var groups = container.querySelectorAll(".po-site-settings__group");
+        groups.forEach(function (group) {
+          if (group.getAttribute("data-language") === lang) group.removeAttribute("hidden");
+          else group.setAttribute("hidden", "hidden");
+        });
+      });
 
-      // re-apply the stored font for that language to the articles
+      // Re-apply stored font for that language
       var chosen = settings.currentFonts && settings.currentFonts[lang] ? settings.currentFonts[lang] : "system";
       applyFont(lang, chosen, false);
     });
   }
+
+  // ONE global outside-click handler for all instances
+  document.addEventListener("click", function (e) {
+    var openContainers = document.querySelectorAll(".po-site-settings.is-open");
+    openContainers.forEach(function (c) {
+      if (!c.contains(e.target)) {
+        var t = c.querySelector(".po-site-settings__toggle");
+        var p = c.querySelector(".po-site-settings__panel");
+        if (p && t) {
+          p.setAttribute("hidden", "hidden");
+          t.setAttribute("aria-expanded", "false");
+          c.classList.remove("is-open");
+        }
+      }
+    });
+  });
 
   function updateProgressBars(categoryId, readCount, total) {
     var bars = document.querySelectorAll('.po-progress-bar[data-category="' + categoryId + '"]');
@@ -455,69 +522,4 @@
   } else {
     initSiteSettings();
   }
-
-  (function () {
-    const MIN = 85; // 85%
-    const MAX = 150; // 150%
-    const STEP = 5; // 5% increments
-    const KEY = "po_font_size_percent"; // localStorage key
-
-    function clamp(v, min, max) {
-      return Math.max(min, Math.min(max, v));
-    }
-
-    function getSaved() {
-      const raw = localStorage.getItem(KEY);
-      const n = raw ? parseInt(raw, 10) : NaN;
-      return Number.isFinite(n) ? clamp(n, MIN, MAX) : 100;
-    }
-
-    function apply(valPercent, persist = true) {
-      // set CSS variable on <html>
-      document.documentElement.style.setProperty("--po-font-size", `${valPercent}%`);
-      // live label
-      const out = document.getElementById("po-font-size-output");
-      if (out) out.textContent = `${valPercent}%`;
-      // persist
-      if (persist) localStorage.setItem(KEY, String(valPercent));
-    }
-
-    function initControls() {
-      const btnDec = document.querySelector(".po-font-size--decrease");
-      const btnInc = document.querySelector(".po-font-size--increase");
-      const btnReset = document.querySelector(".po-font-size--reset");
-
-      if (!btnDec || !btnInc || !btnReset) return;
-
-      // initial
-      apply(getSaved(), false);
-
-      btnDec.addEventListener("click", () => {
-        apply(clamp(getSaved() - STEP, MIN, MAX));
-      });
-      btnInc.addEventListener("click", () => {
-        apply(clamp(getSaved() + STEP, MIN, MAX));
-      });
-      btnReset.addEventListener("click", () => {
-        apply(100);
-      });
-
-      // Keyboard shortcuts (optional): Ctrl/Cmd + / and = to dec/inc
-      document.addEventListener("keydown", (e) => {
-        const isMod = e.ctrlKey || e.metaKey;
-        if (!isMod) return;
-        if (e.key === "=") {
-          apply(clamp(getSaved() + STEP, MIN, MAX));
-        }
-        if (e.key === "-") {
-          apply(clamp(getSaved() - STEP, MIN, MAX));
-        }
-        if (e.key.toLowerCase() === "0") {
-          apply(100);
-        }
-      });
-    }
-
-    document.addEventListener("DOMContentLoaded", initControls);
-  })();
 })(window, document);

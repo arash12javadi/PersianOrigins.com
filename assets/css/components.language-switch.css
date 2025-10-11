@@ -1,7 +1,16 @@
 /* ---------- Language Switch (final, left-anchored, RTL-safe) ---------- */
 
-/* Panel base styles */
+/* Base: used for BOTH floating and inline (no fixed pos here) */
 .po-language-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.po-language-switch--inline {
+  position: static;
+}
+/* Panel base styles */
+.po-language-switch--floating {
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -15,7 +24,7 @@
 }
 
 /* Fixed wrapper — ALWAYS stuck to the left, regardless of language */
-.po-switch-wrap {
+.po-switch-wrap.po-switch-wrap--footer {
   position: fixed;
   top: 10rem;
   left: 0 !important; /* pin to left edge */

@@ -12,6 +12,9 @@ class Persian_Origins_Site_Settings
 
     private $language_switcher;
 
+    /** Singleton guard for the floating instance */
+    private static $floating_rendered = false;
+
     /**
      * Structured font metadata grouped by language and slug.
      *
@@ -38,8 +41,41 @@ class Persian_Origins_Site_Settings
 
         add_filter('body_class', [$this, 'filter_body_class']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_assets'], 20);
+        // Floating widget in footer
         add_action('wp_footer', [$this, 'render_panel'], 20);
+
+        // shortcode for site setting [site_settings]
+        add_shortcode('site_settings', [$this, 'shortcode_site_settings']);
     }
+
+    public function shortcode_site_settings($atts = []): string
+    {
+        $atts = shortcode_atts(
+            [
+                'class'    => '',           // extra classes
+                'floating' => 'inline',     // inline | floating
+            ],
+            $atts,
+            'site_settings'
+        );
+
+        $want_floating = ($atts['floating'] === 'floating');
+
+        // If floating already rendered (footer or another shortcode), downgrade to inline
+        if ($want_floating && self::$floating_rendered) {
+            $want_floating = false;
+        }
+
+        if ($want_floating) {
+            self::$floating_rendered = true;
+        }
+
+        $variant_class = $want_floating ? 'po-site-settings--floating' : 'po-site-settings--inline';
+        $extra = trim($atts['class'] . ' ' . $variant_class);
+
+        return $this->get_panel_markup($extra, $want_floating);
+    }
+
 
     public function get_script_data(): array
     {
@@ -403,6 +439,107 @@ class Persian_Origins_Site_Settings
     }
 
 
+    /**
+     * Return the settings panel markup (used by both footer + shortcode).
+     * $extra_wrapper_classes lets shortcode add extra classes.
+     */
+    public function get_panel_markup(string $extra_wrapper_classes = '', bool $floating = false): string
+    {
+        $current_language = $this->get_current_language();
+        $current_theme    = $this->get_theme_preference();
+        $current_fonts    = [
+            'en' => $this->get_font_preference('en'),
+            'fa' => $this->get_font_preference('fa'),
+        ];
+        $font_options     = $this->build_font_options();
+
+        // Ensure unique IDs per instance
+        $uid = wp_unique_id('po-ss-');
+
+        ob_start();
+?>
+        <div class="po-site-settings <?php echo esc_attr($extra_wrapper_classes); ?>"
+            data-current-language="<?php echo esc_attr($current_language); ?>"
+            data-instance="<?php echo esc_attr($uid); ?>"
+            data-floating="<?php echo $floating ? '1' : '0'; ?>">
+            <button type="button"
+                class="po-site-settings__toggle"
+                aria-expanded="false"
+                aria-controls="<?php echo esc_attr($uid); ?>-panel">
+                <span class="po-site-settings__toggle-icon" aria-hidden="true">&#9881;</span>
+                <span class="po-site-settings__toggle-label"><?php esc_html_e('Site settings', 'persian-origins'); ?></span>
+            </button>
+
+            <div class="po-site-settings__panel"
+                id="<?php echo esc_attr($uid); ?>-panel"
+                hidden>
+                <div class="po-site-settings__section">
+                    <label for="<?php echo esc_attr($uid); ?>-theme" class="po-site-settings__label">
+                        <?php esc_html_e('Theme', 'persian-origins'); ?>
+                    </label>
+                    <select id="<?php echo esc_attr($uid); ?>-theme" class="po-site-settings__select">
+                        <option value="light" <?php selected('light', $current_theme); ?>>
+                            <?php esc_html_e('Light', 'persian-origins'); ?>
+                        </option>
+                        <option value="dark" <?php selected('dark', $current_theme); ?>>
+                            <?php esc_html_e('Dark', 'persian-origins'); ?>
+                        </option>
+                    </select>
+                </div>
+
+                <div class="po-site-settings__section">
+                    <span class="po-site-settings__label"><?php esc_html_e('Font', 'persian-origins'); ?></span>
+                    <?php foreach ($font_options as $language => $options) : ?>
+                        <div class="po-site-settings__group"
+                            data-language="<?php echo esc_attr($language); ?>"
+                            <?php echo ($language === $current_language) ? '' : 'hidden'; ?>>
+                            <label for="<?php echo esc_attr($uid); ?>-font-<?php echo esc_attr($language); ?>"
+                                class="po-site-settings__sub-label">
+                                <?php echo ('fa' === $language)
+                                    ? esc_html__('Persian font', 'persian-origins')
+                                    : esc_html__('English font', 'persian-origins'); ?>
+                            </label>
+                            <select
+                                id="<?php echo esc_attr($uid); ?>-font-<?php echo esc_attr($language); ?>"
+                                class="po-site-settings__select po-site-settings__select--font"
+                                data-language="<?php echo esc_attr($language); ?>">
+                                <?php foreach ($options as $option) : ?>
+                                    <option value="<?php echo esc_attr($option['slug']); ?>"
+                                        <?php selected($option['slug'], $current_fonts[$language]); ?>>
+                                        <?php echo esc_html($option['label']); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+
+                <div class="po-site-settings__section">
+                    <span class="po-site-settings__label" id="<?php echo esc_attr($uid); ?>-font-size-label">
+                        <?php esc_html_e('Text size', 'persian-origins'); ?>
+                    </span>
+                    <div class="po-site-settings__font-size-controls"
+                        role="group"
+                        aria-labelledby="<?php echo esc_attr($uid); ?>-font-size-label">
+                        <button type="button"
+                            class="po-site-settings__btn po-font-size--decrease"
+                            aria-label="<?php esc_attr_e('Decrease text size', 'persian-origins'); ?>">A−</button>
+                        <output id="po-font-size-output" class="po-site-settings__font-size-output" aria-live="polite">100%</output>
+                        <button type="button"
+                            class="po-site-settings__btn po-font-size--increase"
+                            aria-label="<?php esc_attr_e('Increase text size', 'persian-origins'); ?>">A+</button>
+                        <button type="button"
+                            class="po-site-settings__btn po-font-size--reset"
+                            aria-label="<?php esc_attr_e('Reset text size', 'persian-origins'); ?>">
+                            <?php esc_html_e('Reset', 'persian-origins'); ?>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+<?php
+        return (string) ob_get_clean();
+    }
 
 
     private function escape_css_string(string $value): string
@@ -412,63 +549,12 @@ class Persian_Origins_Site_Settings
 
     public function render_panel(): void
     {
-        $current_language = $this->get_current_language();
-        $current_theme    = $this->get_theme_preference();
-        $current_fonts    = [
-            'en' => $this->get_font_preference('en'),
-            'fa' => $this->get_font_preference('fa'),
-        ];
-        $font_options     = $this->build_font_options();
-?>
-        <div class="po-site-settings" data-current-language="<?php echo esc_attr($current_language); ?>">
-            <button type="button" class="po-site-settings__toggle" aria-expanded="false" aria-controls="po-site-settings-panel">
-                <span class="po-site-settings__toggle-icon" aria-hidden="true">⚙️</span>
-                <span class="po-site-settings__toggle-label"><?php esc_html_e('Site settings', 'persian-origins'); ?></span>
-            </button>
-            <div class="po-site-settings__panel" id="po-site-settings-panel" hidden>
-                <div class="po-site-settings__section">
-                    <label for="po-site-settings-theme" class="po-site-settings__label"><?php esc_html_e('Theme', 'persian-origins'); ?></label>
-                    <select id="po-site-settings-theme" class="po-site-settings__select">
-                        <option value="light" <?php selected('light', $current_theme); ?>><?php esc_html_e('Light', 'persian-origins'); ?></option>
-                        <option value="dark" <?php selected('dark', $current_theme); ?>><?php esc_html_e('Dark', 'persian-origins'); ?></option>
-                    </select>
-                </div>
-                <div class="po-site-settings__section">
-                    <span class="po-site-settings__label"><?php esc_html_e('Font', 'persian-origins'); ?></span>
-                    <?php foreach ($font_options as $language => $options) : ?>
-                        <div class="po-site-settings__group" data-language="<?php echo esc_attr($language); ?>" <?php echo ($language === $current_language) ? '' : 'hidden'; ?>>
-                            <label for="po-site-settings-font-<?php echo esc_attr($language); ?>" class="po-site-settings__sub-label">
-                                <?php echo ('fa' === $language)
-                                    ? esc_html__('Persian font', 'persian-origins')
-                                    : esc_html__('English font', 'persian-origins'); ?>
-                            </label>
-                            <select
-                                id="po-site-settings-font-<?php echo esc_attr($language); ?>"
-                                class="po-site-settings__select po-site-settings__select--font"
-                                data-language="<?php echo esc_attr($language); ?>">
-                                <?php foreach ($options as $option) : ?>
-                                    <option value="<?php echo esc_attr($option['slug']); ?>" <?php selected($option['slug'], $current_fonts[$language]); ?>>
-                                        <?php echo esc_html($option['label']); ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    <?php endforeach; ?>
-                </div>
-                <div class="po-site-settings__section">
-                    <span class="po-site-settings__label" id="po-font-size-label"><?php esc_html_e('Text size', 'persian-origins'); ?></span>
-                    <div class="po-site-settings__font-size-controls" role="group" aria-labelledby="po-font-size-label">
-                        <button type="button" class="po-site-settings__btn po-font-size--decrease" aria-label="<?php esc_attr_e('Decrease text size', 'persian-origins'); ?>">A−</button>
-                        <output id="po-font-size-output" class="po-site-settings__font-size-output" aria-live="polite">100%</output>
-                        <button type="button" class="po-site-settings__btn po-font-size--increase" aria-label="<?php esc_attr_e('Increase text size', 'persian-origins'); ?>">A+</button>
-                        <button type="button" class="po-site-settings__btn po-font-size--reset" aria-label="<?php esc_attr_e('Reset text size', 'persian-origins'); ?>">
-                            <?php esc_html_e('Reset', 'persian-origins'); ?>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        // Only render ONE floating widget from footer per page.
+        if (self::$floating_rendered) {
+            return;
+        }
 
-<?php
+        echo $this->get_panel_markup('po-site-settings--floating', true); // flag floating
+        self::$floating_rendered = true;
     }
 }

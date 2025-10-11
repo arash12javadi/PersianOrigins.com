@@ -1,5 +1,12 @@
 /* ---------- Site Settings ---------- */
+/* Base (works for inline shortcode instances) */
 .po-site-settings {
+  position: static; /* not fixed anymore */
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.po-site-settings.po-site-settings--floating {
   position: fixed;
   bottom: 1.5rem;
   left: 0.5rem !important;
