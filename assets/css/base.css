@@ -46,3 +46,102 @@
   color: var(--po-text);
   border-color: var(--po-border);
 }
+
+/* ================ Category Styles ================ */
+/* ---------- category cards */
+a.po-cat-card__media {
+  display: flex;
+  justify-content: center;
+}
+img.attachment-medium.size-medium {
+  max-width: 225px;
+  border-radius: 5px;
+}
+
+a.po-cat-card__media {
+  background: #fff;
+  padding-bottom: 2rem;
+  padding-top: 2rem;
+}
+
+article.po-cat-card {
+  filter: drop-shadow(2px 4px 6px lightgrey);
+}
+
+/* ---------- Responsive Grid driven by .cols-N ---------- */
+/* Base: phones <576px = 1 col */
+.po-cat-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+/* ≥576px (Bootstrap sm): up to 2 cols max */
+@media (min-width: 576px) {
+  .po-cat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .po-cat-grid.cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+/* ≥768px (Bootstrap md): use the author's max columns (1..6) */
+@media (min-width: 768px) {
+  .po-cat-grid.cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .po-cat-grid.cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .po-cat-grid.cols-3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .po-cat-grid.cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .po-cat-grid.cols-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+  .po-cat-grid.cols-6 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+/* Cards (use your variables; fixed a var name) */
+.po-cat-card {
+  background: var(--po-surface, #f7f7f7); /* was --po-card-bg */
+  border: 1px solid var(--po-border, #e5e5e5);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+.po-cat-card__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.po-cat-card__body {
+  padding: 0.75rem 1rem;
+}
+.po-cat-title {
+  font-weight: 600;
+  margin: 0 0 0.35rem;
+}
+.po-cat-desc {
+  margin: 0;
+  color: var(--po-muted, #555);
+}
+
+/* Language visibility */
+body.po-lang-en .po-text--fa {
+  display: none;
+}
+body.po-lang-fa .po-text--en {
+  display: none;
+}
+
+/* Read-more */
+.po-readmore {
+  font-weight: 600;
+  text-decoration: underline;
+}

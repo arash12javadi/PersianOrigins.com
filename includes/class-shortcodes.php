@@ -121,26 +121,36 @@ class Persian_Origins_Categories_Shortcode
     public static function styles()
     {
         $css = <<<CSS
-        .po-cat-grid{display:grid;gap:1rem}
-        .po-cat-grid.cols-1{grid-template-columns:repeat(1,minmax(0,1fr))}
-        .po-cat-grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr))}
-        .po-cat-grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-        .po-cat-grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr))}
-        .po-cat-grid.cols-5{grid-template-columns:repeat(5,minmax(0,1fr))}
-        .po-cat-grid.cols-6{grid-template-columns:repeat(6,minmax(0,1fr))}
-        .po-cat-card{background:var(--po-card-bg,#f7f7f7);border:1px solid var(--po-border,#e5e5e5);border-radius:.75rem;overflow:hidden}
+        /* Neutral helpers only — no grid-template-columns here */
+        .po-cat-card{border-radius:.75rem;overflow:hidden}
         .po-cat-card__media img{display:block;width:100%;height:auto}
         .po-cat-card__body{padding:.75rem 1rem}
         .po-cat-title{font-weight:600;margin:0 0 .35rem}
         .po-cat-desc{margin:0;color:var(--po-muted,#555)}
-        /* Language visibility based on your existing body classes */
         body.po-lang-en .po-text--fa{display:none}
         body.po-lang-fa .po-text--en{display:none}
+        .po-readmore{font-weight:600;text-decoration:underline}
         CSS;
         wp_register_style('po-cats-inline', false);
         wp_enqueue_style('po-cats-inline');
         wp_add_inline_style('po-cats-inline', $css);
     }
+
+
+    private static function trim_like_excerpt(string $text, string $more_html = ''): string
+    {
+        $len = (int) apply_filters('excerpt_length', 55);
+
+        // Fallback to theme’s excerpt_more if no custom "more" HTML was given
+        if ($more_html === '') {
+            $more_html = apply_filters('excerpt_more', ' &hellip;');
+        }
+
+        $trimmed = wp_trim_words(wp_strip_all_tags($text), $len, $more_html);
+
+        return wp_kses_post(wpautop($trimmed));
+    }
+
 
     public static function render($atts)
     {
@@ -216,17 +226,25 @@ class Persian_Origins_Categories_Shortcode
             echo '<span class="po-text--fa">' . esc_html($name_fa_safe) . '</span>';
             echo '</a></h3>';
 
-            // Description (both langs)
+            // Description (both langs) — trimmed like excerpts with localized "read more"
             if (!empty($desc_en) || !empty($desc_fa_safe)) {
-                echo '<div class="po-cat-desc">';
+                echo '<div class="po-cat-desc entry-summary">';
+
+                // Build localized "read more" anchors
+                $more_en = ' <a class="po-readmore" href="' . esc_url($link) . '">' . esc_html__('Read more', 'persian-origins') . '</a>';
+                // Persian text; you can also wrap it with a translation function if you add it to your .po file
+                $more_fa = ' <a class="po-readmore po-readmore--fa" href="' . esc_url($link) . '">بیشتر بخوانید</a>';
+
                 if (!empty($desc_en)) {
-                    echo '<div class="po-text--en">' . wp_kses_post(wpautop($desc_en)) . '</div>';
+                    echo '<div class="po-text--en">' . self::trim_like_excerpt($desc_en, $more_en) . '</div>';
                 }
                 if (!empty($desc_fa_safe)) {
-                    echo '<div class="po-text--fa">' . wp_kses_post(wpautop($desc_fa_safe)) . '</div>';
+                    echo '<div class="po-text--fa">' . self::trim_like_excerpt($desc_fa_safe, $more_fa) . '</div>';
                 }
+
                 echo '</div>';
             }
+
 
             echo '</div></article>';
         }

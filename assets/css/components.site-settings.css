@@ -13,7 +13,7 @@
 .po-site-settings.po-site-settings--floating {
   position: fixed;
   bottom: 1rem;
-  left: 1rem;
+  left: 0.25rem;
   z-index: 9998;
   /* keep the layout simple: single toggle + panel above it */
   display: inline-flex;
@@ -165,7 +165,7 @@
 @media (max-width: 992px) {
   .po-site-settings.po-site-settings--floating {
     bottom: 20%;
-    left: 0.75rem;
+    left: 0.25rem;
   }
 }
 
