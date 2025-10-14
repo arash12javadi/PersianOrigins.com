@@ -18,6 +18,8 @@ class Persian_Origins_Content
     /** Post meta keys (Persian fields) */
     const META_TITLE_FA   = '_po_title_fa';
     const META_CONTENT_FA = '_po_content_fa';
+    const META_TITLE_FA_NORM   = '_po_title_fa_norm';
+    const META_CONTENT_FA_NORM = '_po_content_fa_norm';
 
     /** Term meta keys for categories (Persian fields) */
     const TERM_NAME_FA = '_po_term_name_fa';
@@ -163,6 +165,20 @@ class Persian_Origins_Content
         if (isset($_POST['po_content_fa'])) {
             update_post_meta($post_id, self::META_CONTENT_FA, wp_kses_post(wp_unslash($_POST['po_content_fa'])));
         }
+        // Build normalized copies for search (Arabic -> Persian; strip ZWNJ)
+        $map = ['ي' => 'ی', 'ى' => 'ی', 'ك' => 'ک', "‌" => '']; // ZWNJ is U+200C
+
+        $title_fa   = get_post_meta($post_id, self::META_TITLE_FA, true);
+        $content_fa = get_post_meta($post_id, self::META_CONTENT_FA, true);
+
+        $title_norm   = $title_fa   !== '' ? strtr($title_fa,   $map) : '';
+        $content_norm = $content_fa !== '' ? strtr($content_fa, $map) : '';
+
+        if ($title_norm !== '')   update_post_meta($post_id, self::META_TITLE_FA_NORM,   $title_norm);
+        else                      delete_post_meta($post_id, self::META_TITLE_FA_NORM);
+
+        if ($content_norm !== '') update_post_meta($post_id, self::META_CONTENT_FA_NORM, $content_norm);
+        else                      delete_post_meta($post_id, self::META_CONTENT_FA_NORM);
     }
 
     /* ---------------------------

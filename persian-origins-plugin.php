@@ -30,6 +30,7 @@ final class Persian_Origins_Plugin
     private $content;
     private $excerpt_translation;
     private $cookie_popup;
+    private $fa_digits;
 
     private function __construct()
     {
@@ -80,6 +81,8 @@ final class Persian_Origins_Plugin
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-excerpt-translation.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . '/includes/class-po-category-meta.php';
         require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-cookie-popup.php';
+        require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-po-search-fa.php';
+        require_once PERSIAN_ORIGINS_PLUGIN_DIR . 'includes/class-po-fa-digits.php';
     }
 
     private function init_components(): void
@@ -101,6 +104,9 @@ final class Persian_Origins_Plugin
         $this->excerpt_translation->register();
         $this->cookie_popup = new Persian_Origins_Cookie_Popup();
         $this->cookie_popup->register();
+        // Let the switcher decide when digits should be FA
+        $this->fa_digits = new Persian_Origins_FA_Digits($this->language_switcher ?? null);
+        $this->fa_digits->register();
     }
 
     private function register_hooks(): void
