@@ -121,11 +121,19 @@ class Persian_Origins_Language_Switcher
 
     public function filter_language_attributes($output, $doctype)
     {
-        $dir = ($this->get_current_language() === 'fa') ? 'rtl' : 'ltr';
-        // strip any existing dir attr then append ours
+        $is_fa = ($this->get_current_language() === 'fa');
+
+        // Decide attributes
+        $lang = $is_fa ? 'fa-IR' : get_bloginfo('language'); // e.g., en-GB
+        $dir  = $is_fa ? 'rtl'    : 'ltr';
+
+        // Strip any existing lang/dir then append ours (avoid duplicates/mixups)
         $output = preg_replace('/\sdir=("|\')(rtl|ltr)\1/i', '', $output);
-        return trim($output . ' dir="' . esc_attr($dir) . '"');
+        $output = preg_replace('/\slang=("|\')[^"\']*\1/i', '', $output);
+
+        return trim($output . ' lang="' . esc_attr($lang) . '" dir="' . esc_attr($dir) . '"');
     }
+
 
     public function filter_body_class(array $classes): array
     {

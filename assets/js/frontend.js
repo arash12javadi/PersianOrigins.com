@@ -399,42 +399,69 @@
 
   function updateProgressBars(categoryId, readCount, total) {
     var bars = document.querySelectorAll('.po-progress-bar[data-category="' + categoryId + '"]');
-    if (!bars.length) {
-      return;
-    }
+    if (!bars.length) return;
 
     var percentage = 0;
-    if (total > 0) {
-      percentage = Math.min(100, Math.round((readCount / total) * 100));
+    if (total > 0) percentage = Math.min(100, Math.round((readCount / total) * 100));
+
+    // helpers
+    var faMap = { 0: "۰", 1: "۱", 2: "۲", 3: "۳", 4: "۴", 5: "۵", 6: "۶", 7: "۷", 8: "۸", 9: "۹" };
+    function toFaDigits(s) {
+      return String(s).replace(/[0-9]/g, function (d) {
+        return faMap[d];
+      });
+    }
+
+    function ensureBilingual(container) {
+      // Ensure the container has .po-text--en and .po-text--fa children
+      var en = container.querySelector(".po-text--en");
+      var fa = container.querySelector(".po-text--fa");
+      if (!en) {
+        en = document.createElement("span");
+        en.className = "po-text--en";
+        container.textContent = "";
+        container.appendChild(en);
+      }
+      if (!fa) {
+        fa = document.createElement("span");
+        fa.className = "po-text--fa";
+        container.appendChild(fa);
+      }
+      return { en: en, fa: fa };
     }
 
     bars.forEach(function (bar) {
       bar.setAttribute("data-read", readCount);
       bar.setAttribute("data-total", total);
 
-      var percentEl = bar.querySelector(".po-progress-bar__percent");
-      if (percentEl) {
-        percentEl.textContent = percentage + "%";
+      // percent
+      var percentWrap = bar.querySelector(".po-progress-bar__percent");
+      if (percentWrap) {
+        var nodes = ensureBilingual(percentWrap);
+        nodes.en.textContent = percentage + "%";
+        nodes.fa.textContent = toFaDigits(percentage) + "٪";
       }
 
+      // track + fill
       var track = bar.querySelector(".po-progress-bar__track");
-      if (track) {
-        track.setAttribute("aria-valuenow", percentage);
-      }
+      if (track) track.setAttribute("aria-valuenow", percentage);
 
       var fill = bar.querySelector(".po-progress-bar__fill");
-      if (fill) {
-        fill.style.width = percentage + "%";
-      }
+      if (fill) fill.style.width = percentage + "%";
 
+      // counts
       var countsEl = bar.querySelector(".po-progress-bar__counts");
       if (countsEl) {
-        var numbersEl = countsEl.querySelector(".po-progress-bar__numbers");
-        if (numbersEl) {
-          numbersEl.textContent = readCount + " / " + total;
-        } else {
-          countsEl.textContent = readCount + " / " + total;
+        var numbers = countsEl.querySelector(".po-progress-bar__numbers");
+        if (!numbers) {
+          numbers = document.createElement("span");
+          numbers.className = "po-progress-bar__numbers";
+          countsEl.textContent = "";
+          countsEl.appendChild(numbers);
         }
+        var nodes2 = ensureBilingual(numbers);
+        nodes2.en.textContent = readCount + " / " + total;
+        nodes2.fa.textContent = toFaDigits(readCount) + " / " + toFaDigits(total);
       }
     });
   }
@@ -523,3 +550,34 @@
     initSiteSettings();
   }
 })(window, document);
+
+document.addEventListener(
+  "click",
+  function (e) {
+    var a = e.target.closest("a");
+    if (!a) return;
+
+    var href = a.getAttribute("href");
+    if (!href) return;
+
+    // Only normalize on pagination-like links to avoid touching other URLs unnecessarily
+    if (!/\/page\/[^\/]+\/?$/i.test(href) && !/[?&]paged=\D/i.test(href)) return;
+
+    var map = { "۰": "0", "۱": "1", "۲": "2", "۳": "3", "۴": "4", "۵": "5", "۶": "6", "۷": "7", "۸": "8", "۹": "9" };
+    var fixed = href.replace(/[۰-۹]/g, function (d) {
+      return map[d] || d;
+    });
+
+    if (fixed !== href) {
+      e.preventDefault();
+      // Keep middle-click/ctrl-click behavior
+      var newTab = e.ctrlKey || e.metaKey || e.button === 1 || a.target === "_blank";
+      if (newTab) {
+        window.open(fixed, a.target || "_blank");
+      } else {
+        window.location.href = fixed;
+      }
+    }
+  },
+  true
+);

@@ -372,41 +372,67 @@ class Persian_Origins_Reading_Progress
         $term = get_term($category_id, 'category');
 
         if ($term instanceof \WP_Term) {
-            // Fetch Persian title (if available)
+            // Titles
             $name_en = $term->name;
-            $name_fa = get_term_meta($category_id, Persian_Origins_Category_Meta::META_NAME_FA, true);
-            if (!$name_fa) {
-                $name_fa = $name_en;
-            }
+            $name_fa = get_term_meta($category_id, Persian_Origins_Category_Meta::META_NAME_FA, true) ?: $name_en;
 
-            // Output both (toggled via .po-text--en / .po-text--fa)
-            $label  = '<span class="po-text--en">' .
-                sprintf(esc_html__('Reading progress for %s', 'persian-origins'), esc_html($name_en)) .
-                '</span>';
+            // Bilingual label (your existing pattern)
+            $label  = '<span class="po-text--en">'
+                . sprintf(esc_html__('Reading progress for %s', 'persian-origins'), esc_html($name_en))
+                . '</span>';
 
-            $label .= '<span class="po-text--fa">' .
-                sprintf(esc_html__('میزان مطالعه شما از %s', 'persian-origins'), esc_html($name_fa)) .
-                '</span>';
+            $label .= '<span class="po-text--fa">'
+                . sprintf(esc_html__('میزان مطالعه شما از %s', 'persian-origins'), esc_html($name_fa))
+                . '</span>';
         } else {
             $label = esc_html__('Reading progress', 'persian-origins');
         }
 
-        $percentage      = (int) $progress['percentage'];
-        $percentage_text = number_format_i18n($percentage) . '%';
-        $read_count      = (int) $progress['read_count'];
-        $total           = (int) $progress['total'];
+        // Core numbers
+        $percentage = (int) $progress['percentage'];
+        $read_count = (int) $progress['read_count'];
+        $total      = (int) $progress['total'];
 
-        $markup  = '<div class="po-progress-bar" data-category="' . esc_attr($category_id) . '" data-total="' . esc_attr($total) . '" data-read="' . esc_attr($read_count) . '">';
+        // EN texts
+        $percentage_en = number_format_i18n($percentage) . '%';
+        $counts_en     = sprintf('%d / %d', $read_count, $total);
+
+        // FA texts (always compute; CSS will toggle visibility)
+        static $fa_map = ['0' => '۰', '1' => '۱', '2' => '۲', '3' => '۳', '4' => '۴', '5' => '۵', '6' => '۶', '7' => '۷', '8' => '۸', '9' => '۹'];
+        $percentage_fa = strtr($percentage_en, $fa_map);
+        $counts_fa     = strtr($counts_en,     $fa_map);
+
+        // Markup
+        $markup  = '<div class="po-progress-bar"'
+            . ' data-category="' . esc_attr($category_id) . '"'
+            . ' data-total="'    . esc_attr($total)      . '"'
+            . ' data-read="'     . esc_attr($read_count) . '">';
+
         $markup .= '<div class="po-progress-bar__meta">';
         $markup .= '<span class="po-progress-bar__label">' . $label . '</span>';
-        $markup .= '<span class="po-progress-bar__percent">' . esc_html($percentage_text) . '</span>';
+
+        // Percent: EN + FA, toggled via CSS
+        $markup .= '<span class="po-progress-bar__percent">'
+            .   '<span class="po-text--en">' . esc_html($percentage_en) . '</span>'
+            .   '<span class="po-text--fa">' . esc_html($percentage_fa) . '</span>'
+            . '</span>';
+
         $markup .= '</div>';
-        $markup .= '<div class="po-progress-bar__track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' . esc_attr($percentage) . '">';
-        $markup .= '<div class="po-progress-bar__fill" style="width:' . esc_attr($percentage) . '%"></div>';
+
+        $markup .= '<div class="po-progress-bar__track" role="progressbar"'
+            . ' aria-valuemin="0" aria-valuemax="100"'
+            . ' aria-valuenow="' . esc_attr($percentage) . '">';
+        $markup .=   '<div class="po-progress-bar__fill" style="width:' . esc_attr($percentage) . '%"></div>';
         $markup .= '</div>';
+
+        // Counts: EN + FA, toggled via CSS
         $markup .= '<div class="po-progress-bar__counts" aria-live="polite">';
-        $markup .= '<span class="po-progress-bar__numbers">' . esc_html(sprintf('%d / %d', $read_count, $total)) . '</span>';
+        $markup .=   '<span class="po-progress-bar__numbers">'
+            .       '<span class="po-text--en">' . esc_html($counts_en) . '</span>'
+            .       '<span class="po-text--fa">' . esc_html($counts_fa) . '</span>'
+            .   '</span>';
         $markup .= '</div>';
+
         $markup .= '</div>';
 
         return (string) apply_filters('persian_origins_progress_bar_markup', $markup, $progress, $category_id);

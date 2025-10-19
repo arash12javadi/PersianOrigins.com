@@ -145,3 +145,103 @@ body.po-lang-fa .po-text--en {
   font-weight: 600;
   text-decoration: underline;
 }
+
+/* Default: hide both until language is known (prevents flash) */
+.po-text--en,
+.po-text--fa {
+  display: none;
+}
+
+/* FA pages */
+html[lang^="fa"] .po-text--fa,
+body.po-lang-fa .po-text--fa {
+  display: inline;
+}
+html[lang^="fa"] .po-text--en,
+body.po-lang-fa .po-text--en {
+  display: none;
+}
+
+/* EN pages (or fallback) */
+html[lang^="en"] .po-text--en,
+body.po-lang-en .po-text--en {
+  display: inline;
+}
+html[lang^="en"] .po-text--fa,
+body.po-lang-en .po-text--fa {
+  display: none;
+}
+
+/* Safe default if some theme sets a different lang code */
+html:not([lang^="fa"]):not([lang^="en"]) .po-text--en {
+  display: inline;
+}
+
+/*----------- Some more theme refinements */
+html[lang^="fa"] .nav-links {
+  direction: ltr;
+}
+
+/* Flip the whole panel in FA mode */
+html[dir="rtl"] .po-site-settings.po-site-settings--panel-only {
+  direction: rtl;
+  text-align: right;
+}
+
+/* Row layout: label on the right, control on the left */
+html[dir="rtl"] #po-ss-1-panel .po-site-settings__section,
+html[dir="rtl"] #po-ss-2-panel .po-site-settings__section {
+  text-align: end;
+}
+
+/* Make labels RTL (Persian groups) */
+html[dir="rtl"] #po-ss-1-panel .po-site-settings__label,
+html[dir="rtl"] #po-ss-1-panel .po-site-settings__sub-label,
+html[dir="rtl"] #po-ss-2-panel .po-site-settings__label,
+html[dir="rtl"] #po-ss-2-panel .po-site-settings__sub-label {
+  direction: rtl !important;
+  unicode-bidi: plaintext;
+  text-align: right !important;
+}
+
+/* Keep the EN group's sub-label LTR so Latin reads naturally */
+#po-ss-1-panel [data-language="en"] .po-site-settings__sub-label,
+#po-ss-2-panel [data-language="en"] .po-site-settings__sub-label {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* (Already added earlier) Make selects RTL in FA mode */
+html[dir="rtl"] #po-ss-1-panel .po-site-settings__select,
+html[dir="rtl"] #po-ss-2-panel .po-site-settings__select {
+  direction: rtl !important;
+  text-align: right !important; /* Chrome/Edge */
+  text-align-last: right !important; /* Firefox */
+  unicode-bidi: plaintext !important;
+  padding-inline: 0.5rem 0.75rem;
+}
+html[dir="rtl"] #po-ss-1-panel .po-site-settings__select option,
+html[dir="rtl"] #po-ss-2-panel .po-site-settings__select option {
+  direction: rtl !important;
+  text-align: right !important;
+  unicode-bidi: plaintext !important;
+}
+
+/* Keep EN group's select LTR */
+#po-ss-1-panel [data-language="en"] .po-site-settings__select,
+#po-ss-1-panel [data-language="en"] .po-site-settings__select option,
+#po-ss-2-panel [data-language="en"] .po-site-settings__select,
+#po-ss-2-panel [data-language="en"] .po-site-settings__select option {
+  direction: ltr !important;
+  text-align: left !important;
+  text-align-last: left !important;
+  unicode-bidi: plaintext !important;
+}
+
+/* Font-size controls look correct in RTL */
+html[dir="rtl"] #po-ss-1-panel .po-site-settings__font-size-controls,
+html[dir="rtl"] #po-ss-2-panel .po-site-settings__font-size-controls {
+  direction: rtl;
+  justify-content: flex-start;
+  gap: 0.5rem;
+}

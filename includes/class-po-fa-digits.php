@@ -27,6 +27,11 @@ final class Persian_Origins_FA_Digits
         }
 
         add_filter('po_use_fa_digits', [$this, 'filter_use_fa_digits'], 10, 2);
+        add_filter('paginate_links', [$this, 'ensure_ascii_digits_in_href'], 20);
+        add_filter('get_pagenum_link', [$this, 'normalize_url_digits'], 99, 2);
+        add_filter('request', [$this, 'normalize_request_paged'], 0);
+        add_filter('redirect_canonical', [$this, 'normalize_redirect_canonical'], 10, 2);
+        add_action('plugins_loaded', [$this, 'maybe_redirect_fa_paged_in_uri'], 0);
     }
 
     public function attach_filters(): void
@@ -64,7 +69,7 @@ final class Persian_Origins_FA_Digits
         }, 12);
 
         add_filter('paginate_links',                  [$this, 'convert_html_text_only'], 12);
-        add_filter('navigation_markup_template',      [$this, 'convert_html_text_only'], 12);
+        // add_filter('navigation_markup_template',      [$this, 'convert_html_text_only'], 12);
         add_filter('get_archives_link',               [$this, 'convert_html_text_only'], 12);
         add_filter('wp_list_categories',              [$this, 'convert_html_text_only'], 12);
         add_filter('wp_list_pages',                   [$this, 'convert_html_text_only'], 12);
@@ -83,6 +88,40 @@ final class Persian_Origins_FA_Digits
         add_filter('woocommerce_cart_totals_order_total_html', [$this, 'convert_html_text_only'], 12);
         add_filter('woocommerce_get_formatted_order_total',    [$this, 'convert_plain'], 12);
     }
+
+    public function normalize_url_digits($url, $pagenum = null)
+    {
+        if (!$this->is_fa_active() || !is_string($url) || $url === '') return $url;
+
+        // First fix percent-encoded Persian/Arabic-Indic digits
+        $url = $this->percent_encoded_fa_digits_to_ascii($url);
+        // Then fix any raw Unicode digits (just in case)
+        $url = $this->fa_to_latin_digits($url);
+
+        return $url;
+    }
+
+
+    public function ensure_ascii_digits_in_href($html)
+    {
+        if (!$this->is_fa_active() || $html === '' || $html === null) return $html;
+
+        if (is_array($html)) {
+            foreach ($html as $i => $frag) {
+                if (is_string($frag) && $frag !== '') {
+                    $html[$i] = $this->restore_ascii_in_url_attributes($frag);
+                }
+            }
+            return $html;
+        }
+
+        if (is_string($html)) {
+            return $this->restore_ascii_in_url_attributes($html);
+        }
+
+        return $html;
+    }
+
 
     public function start_buffer(): void
     {
@@ -104,12 +143,23 @@ final class Persian_Origins_FA_Digits
 
     public function filter_use_fa_digits(bool $is_fa, string $wp_locale): bool
     {
+        // 1) Explicit switcher
         if ($this->language_switcher && method_exists($this->language_switcher, 'get_current_lang')) {
             $lang = (string) $this->language_switcher->get_current_lang();
-            if ($lang) return ($lang === 'fa');
+            if ($lang === 'fa') return true;
+            if ($lang === 'en') return false;
         }
+
+        // 2) Fallbacks your switcher probably already sets
+        if (!empty($_COOKIE['po_preferred_language']) && $_COOKIE['po_preferred_language'] === 'fa') return true;
+        if (!empty($_GET['lang']) && $_GET['lang'] === 'fa') return true;
+
+        // 3) RTL fallback (only if you want RTL pages to always show Persian digits)
+        if (function_exists('is_rtl') && is_rtl()) return true;
+
+        // 4) Locale fallback
         if (!$is_fa) {
-            $is_fa = (stripos($wp_locale, 'fa_') === 0 || $wp_locale === 'fa' || stripos($wp_locale, 'fa') !== false);
+            $is_fa = (stripos($wp_locale, 'fa') !== false);
         }
         return $is_fa;
     }
@@ -120,9 +170,33 @@ final class Persian_Origins_FA_Digits
         return $this->latin_to_fa_digits($s);
     }
 
+
     public function convert_html_text_only($html)
     {
-        if (!$this->is_fa_active() || !is_string($html) || $html === '') return $html;
+        // If FA mode isn't active or empty input, bail.
+        if (!$this->is_fa_active() || $html === '' || $html === null) {
+            return $html;
+        }
+
+        // If paginate_links() (or others) passed an ARRAY of fragments, convert each one.
+        if (is_array($html)) {
+            foreach ($html as $i => $frag) {
+                if (is_string($frag) && $frag !== '') {
+                    $html[$i] = $this->convert_html_text_only($frag); // recurse on string path
+                }
+            }
+            return $html;
+        }
+
+        // Non-strings: leave untouched.
+        if (!is_string($html)) {
+            return $html;
+        }
+
+        // If it contains sprintf placeholders like %1$s, don't touch it.
+        if (preg_match('/%\d+\$[bcdeEfFgGosuxX]/', $html)) {
+            return $html;
+        }
 
         // ── (0) Mask HTML entities so things like &#xF099; or &#169; don't get mangled
         $entity_placeholders = [];
@@ -186,8 +260,71 @@ final class Persian_Origins_FA_Digits
             $result = strtr($result, $block_placeholders);
         }
 
+        // ── (6) VERY IMPORTANT: keep ASCII digits inside URL attributes (handles raw and %DB%B2 forms)
+        $result = $this->restore_ascii_in_url_attributes($result);
+
         return $result;
     }
+
+    public function normalize_request_paged(array $qv): array
+    {
+        // Normalize "paged" (used by archives), and "page" (used on static pages)
+        foreach (['paged', 'page'] as $key) {
+            if (isset($qv[$key]) && $qv[$key] !== '') {
+                $v = (string) $qv[$key];
+
+                // 1) Convert percent-encoded Persian/Arabic-Indic digits → ASCII
+                $v = $this->percent_encoded_fa_digits_to_ascii($v);
+
+                // 2) Convert raw Unicode Persian/Arabic-Indic digits → ASCII
+                $v = $this->fa_to_latin_digits($v);
+
+                // 3) Keep digits only (defensive), cast to int
+                $v = preg_replace('/\D+/', '', $v);
+                $qv[$key] = $v === '' ? 0 : (int) $v;
+            }
+        }
+        return $qv;
+    }
+
+    public function normalize_redirect_canonical($redirect_url, $requested_url)
+    {
+        if (!$redirect_url || !$this->is_fa_active()) return $redirect_url;
+
+        $fixed = $this->percent_encoded_fa_digits_to_ascii($redirect_url);
+        $fixed = $this->fa_to_latin_digits($fixed);
+
+        return $fixed;
+    }
+
+    public function maybe_redirect_fa_paged_in_uri(): void
+    {
+        if (!$this->is_fa_active()) return;
+
+        // Only act on frontend
+        if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST)) return;
+
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+        if ($uri === '' || strpos($uri, '%') === false) return;
+
+        // Only do work if path contains /page/%XX%YY/ kind of segment
+        if (!preg_match('~/page/(?:%[A-Fa-f0-9]{2}){2}(?:/|$)~', $uri)) return;
+
+        $fixed = $this->percent_encoded_fa_digits_to_ascii($uri);
+        $fixed = $this->fa_to_latin_digits($fixed);
+
+        if ($fixed !== $uri) {
+            // Build absolute target safely
+            $scheme = (is_ssl() ? 'https://' : 'http://');
+            $host   = $_SERVER['HTTP_HOST'] ?? '';
+            $target = $scheme . $host . $fixed;
+
+            // 301 to the ASCII version so rewrites match
+            wp_safe_redirect($target, 301);
+            exit;
+        }
+    }
+
 
     private function latin_to_fa_digits(string $s): string
     {
@@ -205,6 +342,66 @@ final class Persian_Origins_FA_Digits
         ];
         return strtr($s, $map);
     }
+
+    // Add this helper inside Persian_Origins_FA_Digits
+    private function fa_to_latin_digits(string $s): string
+    {
+        static $map = [
+            '۰' => '0',
+            '۱' => '1',
+            '۲' => '2',
+            '۳' => '3',
+            '۴' => '4',
+            '۵' => '5',
+            '۶' => '6',
+            '۷' => '7',
+            '۸' => '8',
+            '۹' => '9',
+        ];
+        return strtr($s, $map);
+    }
+
+
+    /**
+     * Force ASCII digits in URL-carrying attributes (href/src/action/formaction).
+     * Call this AFTER text-node digit conversion.
+     */
+    private function restore_ascii_in_url_attributes(string $html): string
+    {
+        return preg_replace_callback(
+            '/\b(?:href|src|action|formaction)\s*=\s*(["\'])([^"\']*)\1/i',
+            function ($m) {
+                $val = $m[2];
+                $val = $this->percent_encoded_fa_digits_to_ascii($val);
+                $val = $this->fa_to_latin_digits($val);
+                return str_replace($m[2], $val, $m[0]);
+            },
+            $html
+        );
+    }
+
+
+    // Turn %DB%B0..%DB%B9 (Persian) and %D9%B0..%D9%B9 (Arabic-Indic) into ASCII 0..9
+    private function percent_encoded_fa_digits_to_ascii(string $s): string
+    {
+        return preg_replace_callback('/%([A-Fa-f0-9]{2})%([A-Fa-f0-9]{2})/', function ($m) {
+            $b1 = hexdec($m[1]);
+            $b2 = hexdec($m[2]);
+
+            // Persian digits U+06F0..U+06F9 => UTF-8: DB B0..B9
+            if ($b1 === 0xDB && $b2 >= 0xB0 && $b2 <= 0xB9) {
+                return chr(($b2 - 0xB0) + ord('0')); // ASCII digit
+            }
+
+            // Arabic-Indic digits U+0660..U+0669 => UTF-8: D9 B0..B9
+            if ($b1 === 0xD9 && $b2 >= 0xB0 && $b2 <= 0xB9) {
+                return chr(($b2 - 0xB0) + ord('0'));
+            }
+
+            return $m[0]; // leave other %XX%YY pairs alone
+        }, $s);
+    }
+
 
     /**
      * Make a letters-only placeholder like %%POBLOCK_AJ%%, never containing digits.
